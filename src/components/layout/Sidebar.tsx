@@ -39,13 +39,13 @@ function NavSection({ title, items, pathname }: { title: string; items: NavItem[
               aria-current={active ? "page" : undefined}
               className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
                 active
-                  ? "bg-blue-50 text-[#0056B3]"
+                  ? "bg-[#0056B3] text-white shadow-sm"
                   : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
               }`}
             >
               <Icon
                 name={item.icon}
-                className={`text-[20px] ${active ? "text-[#0056B3]" : "text-slate-500"}`}
+                className={`text-[20px] ${active ? "text-white" : "text-slate-500"}`}
               />
               <span>{item.label}</span>
             </Link>
@@ -60,7 +60,7 @@ export default function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="fixed left-0 top-0 z-50 hidden h-full w-72 flex-col justify-between border-r border-slate-200/80 bg-white shadow-sm lg:flex">
+    <aside className="fixed left-0 top-0 z-50 hidden h-full w-72 flex-col justify-between border-r border-slate-200/80 bg-[#f2f4f6] shadow-sm lg:flex">
       <div className="flex flex-1 flex-col overflow-y-auto">
         {/* Brand */}
         <Link
@@ -78,7 +78,7 @@ export default function Sidebar() {
           </div>
         </Link>
 
-        <NavSection title="Dokumentasi" items={documentationNav} pathname={pathname} />
+        <NavSection title="Documentation" items={documentationNav} pathname={pathname} />
         <NavSection title="Tools" items={toolsNav} pathname={pathname} />
       </div>
 

@@ -13,7 +13,7 @@ export default function Header({ pageLabel }: HeaderProps) {
           Guidebook: PLAVON ke SIAK
         </span>
         <Icon name="chevron_right" className="hidden text-[18px] text-slate-400 sm:inline" />
-        <span className="hidden rounded-full border border-blue-200/60 bg-blue-50 px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wide text-[#0056B3] sm:inline">
+        <span className="hidden text-[13px] font-normal text-slate-600 sm:inline">
           {pageLabel}
         </span>
       </div>

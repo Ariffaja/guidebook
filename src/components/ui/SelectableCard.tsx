@@ -12,6 +12,7 @@ type SelectableCardProps = {
   idleLabel: string;
   selected: boolean;
   onSelect: () => void;
+  routeHref?: string;
   className?: string;
 };
 
@@ -28,24 +29,26 @@ export default function SelectableCard({
   idleLabel,
   selected,
   onSelect,
+  routeHref,
   className = "",
 }: SelectableCardProps) {
   return (
     <button
       type="button"
+      data-route-href={routeHref}
       aria-pressed={selected}
       onClick={onSelect}
-      className={`group relative flex h-full w-full flex-col justify-between rounded-lg border-2 p-8 text-left transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0056B3] ${
+      className={`group relative flex h-full w-full cursor-pointer flex-col justify-between rounded-xl border-2 p-8 text-left transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0056B3] ${
         selected
-          ? "border-[#003F87] bg-[#003F87] text-white shadow-md hover:shadow-xl"
-          : "border-[#c2c6d4]/40 bg-white text-[#191c1e] shadow-sm hover:shadow-md"
+          ? "z-10 scale-[1.015] border-[#003F87] bg-[#003F87] text-white shadow-lg"
+          : "border-[#c2c6d4]/50 bg-white text-[#191c1e] shadow-sm hover:z-10 hover:scale-[1.015] hover:border-[#0056B3] hover:shadow-lg"
       } ${className}`}
     >
       <span className="flex w-full flex-col items-start">
         <span className="mb-6 flex w-full items-center justify-between">
           <span
             className={`flex h-14 w-14 items-center justify-center rounded-lg transition-colors ${
-              selected ? "bg-white/15 text-white" : "bg-[#e6e8ea] text-[#424752]"
+              selected ? "bg-white/15 text-white" : "bg-[#e6e8ea] text-[#424752] group-hover:bg-[#d7e2ff] group-hover:text-[#003F87]"
             }`}
           >
             <Icon name={icon} className="text-[32px]" />

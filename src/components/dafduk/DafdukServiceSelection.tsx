@@ -1,33 +1,17 @@
 "use client";
 
-import { useCallback, useState, type ReactNode } from "react";
+import { useRouter } from "next/navigation";
 import Breadcrumb from "@/components/ui/Breadcrumb";
 import Icon from "@/components/ui/Icon";
 import PageIntro from "@/components/ui/PageIntro";
 import SelectableCard from "@/components/ui/SelectableCard";
 import StepNavigation from "@/components/ui/StepNavigation";
-import Toast from "@/components/ui/Toast";
 import { dafdukServices, type DafdukServiceKey } from "./services";
 
-type ToastState = { id: number; message: ReactNode };
-
 export default function DafdukServiceSelection() {
-  const [selected, setSelected] = useState<DafdukServiceKey>("pindah-keluar");
-  const [toast, setToast] = useState<ToastState | null>(null);
-  const closeToast = useCallback(() => setToast(null), []);
-
-  function handleContinue() {
-    const service = dafdukServices.find((item) => item.key === selected);
-    if (!service) return;
-    // Placeholder sesuai HTML sumber: halaman verifikasi berkas belum tersedia.
-    setToast({
-      id: Date.now(),
-      message: (
-        <>
-          Layanan <strong>{service.toastName}</strong> dipilih. Membuka tahap verifikasi berkas...
-        </>
-      ),
-    });
+  const router = useRouter();
+  function selectService(service: DafdukServiceKey) {
+    router.push(`/dafduk/${service}`);
   }
 
   return (
@@ -44,14 +28,15 @@ export default function DafdukServiceSelection() {
         {dafdukServices.map((service) => (
           <SelectableCard
             key={service.key}
+            routeHref={`/dafduk/${service.key}`}
             icon={service.icon}
             title={service.title}
             tag={service.tag}
             description={service.description}
             footer={service.footer}
             idleLabel="Pilih Layanan"
-            selected={selected === service.key}
-            onSelect={() => setSelected(service.key)}
+            selected={false}
+            onSelect={() => selectService(service.key)}
             className="min-h-[300px]"
           />
         ))}
@@ -75,14 +60,7 @@ export default function DafdukServiceSelection() {
 
       <StepNavigation
         back={{ label: "Kembali ke Beranda", href: "/" }}
-        next={{ label: "Lanjutkan", onClick: handleContinue }}
       />
-
-      {toast && (
-        <Toast key={toast.id} icon="check_circle" onClose={closeToast}>
-          {toast.message}
-        </Toast>
-      )}
     </div>
   );
 }
