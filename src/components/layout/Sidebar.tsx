@@ -60,7 +60,7 @@ export default function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="fixed left-0 top-0 z-50 hidden h-full w-72 flex-col justify-between border-r border-slate-200/80 bg-[#f2f4f6] shadow-sm lg:flex">
+    <aside className="app-sidebar fixed left-0 top-0 z-50 hidden h-full w-72 flex-col justify-between border-r border-slate-200/80 bg-[#f2f4f6] shadow-sm lg:flex">
       <div className="flex flex-1 flex-col overflow-y-auto">
         {/* Brand */}
         <Link

@@ -68,25 +68,17 @@ export default function DeathCategoryStep({ onBack, onOpenVerification }: DeathC
             type="button"
             key={category.key}
             onClick={() => handleOpen(category.key, category.title)}
-            className={`group relative flex h-full w-full cursor-pointer flex-col justify-between rounded-lg bg-white p-6 text-left shadow-sm transition-all duration-200 hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0056B3] ${
-              category.featured
-                ? "border-2 border-[#003F87]"
-                : "border border-[#c2c6d4]/40 hover:border-[#003F87]"
-            }`}
+            className="group relative flex h-full w-full cursor-pointer flex-col justify-between rounded-lg border-2 border-[#dfe3e8] bg-white p-6 text-left shadow-sm transition-all duration-200 hover:z-10 hover:-translate-y-1 hover:scale-[1.01] hover:border-[#0056B3] hover:shadow-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0056B3]"
           >
             <span className="block">
               <span className="mb-4 flex items-center justify-between">
                 <span
-                  className={`flex h-12 w-12 items-center justify-center rounded text-[#003F87] ${
-                    category.featured ? "bg-[#d7e2ff]" : "bg-[#e6e8ea]"
-                  }`}
+                  className="flex h-12 w-12 items-center justify-center rounded bg-[#e6e8ea] text-[#424752] transition-colors group-hover:bg-[#d7e2ff] group-hover:text-[#003F87]"
                 >
                   <Icon name={category.icon} className="text-[24px]" />
                 </span>
                 <span
-                  className={`rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${
-                    category.featured ? "bg-[#d7e2ff] text-[#003F87]" : "bg-[#e6e8ea] text-[#424752]"
-                  }`}
+                  className="rounded-full bg-[#e6e8ea] px-2.5 py-0.5 text-[11px] font-semibold text-[#424752] transition-colors group-hover:bg-[#d7e2ff] group-hover:text-[#003F87]"
                 >
                   {category.badge}
                 </span>

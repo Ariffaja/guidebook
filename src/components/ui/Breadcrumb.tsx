@@ -23,7 +23,7 @@ export default function Breadcrumb({ items }: { items: BreadcrumbItem[] }) {
                 <button
                   type="button"
                   onClick={item.onClick}
-                  className="transition-colors hover:text-[#003F87]"
+                  className="cursor-pointer transition-colors hover:text-[#003F87]"
                 >
                   {item.label}
                 </button>

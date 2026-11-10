@@ -5,14 +5,11 @@ import Breadcrumb from "@/components/ui/Breadcrumb";
 import Icon from "@/components/ui/Icon";
 import StepNavigation from "@/components/ui/StepNavigation";
 import Toast from "@/components/ui/Toast";
-import { birthCategories, type BirthCategory, type BirthCategoryKey } from "./categories";
+import { birthCategories, type BirthCategory } from "./categories";
 
 type BirthCategoryStepProps = {
-  /** Kategori terpilih; disimpan di CapilModule agar bertahan saat kembali dari tahap verifikasi. */
-  selected: BirthCategoryKey | null;
-  onSelect: (key: BirthCategoryKey | null) => void;
   onBack: () => void;
-  /** Dipanggil saat Lanjutkan dengan NIK Bayi Kecil terpilih. */
+  /** Dipanggil saat kategori NIK Bayi Kecil dipilih. */
   onVerifyBayiKecil: () => void;
 };
 
@@ -20,16 +17,14 @@ type ToastState = { id: number; icon: string; message: ReactNode };
 
 /**
  * Kartu kategori kelahiran. Dibuat lokal (bukan SelectableCard) karena desain Stitch-nya
- * berbeda: biru #0056B3, tag per kartu, label "Terpilih" tanpa tanda ✓ ganda, dan bisa dibatalkan.
+ * berbeda: biru #0056B3 dan tag khusus pada setiap kartu.
  */
 function BirthCategoryCard({
   category,
-  selected,
-  onToggle,
+  onSelect,
 }: {
   category: BirthCategory;
-  selected: boolean;
-  onToggle: () => void;
+  onSelect: () => void;
 }) {
   const idleTag =
     category.tagTone === "warm" ? "bg-[#FFDBCC] text-[#351000]" : "bg-gray-100 text-gray-600";
@@ -37,53 +32,38 @@ function BirthCategoryCard({
   return (
     <button
       type="button"
-      aria-pressed={selected}
-      onClick={onToggle}
-      className={`group relative flex h-full w-full flex-col justify-between rounded-xl border p-8 text-left transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0056B3] ${
-        selected
-          ? "border-[#0056B3] bg-[#0056B3] text-white shadow-lg"
-          : "border-gray-200 bg-white shadow-sm hover:shadow-md"
-      }`}
+      onClick={onSelect}
+      className="group relative flex h-full w-full cursor-pointer flex-col justify-between rounded-xl border-2 border-gray-200 bg-white p-8 text-left shadow-sm transition-all duration-200 hover:-translate-y-1 hover:scale-[1.01] hover:border-[#0056B3] hover:shadow-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0056B3]"
     >
       <span className="mb-6 flex w-full items-center justify-between">
         <span
-          className={`flex h-14 w-14 items-center justify-center rounded-xl transition-colors ${
-            selected ? "bg-white/20 text-white" : "bg-blue-50 text-[#0056B3]"
-          }`}
+          className="flex h-14 w-14 items-center justify-center rounded-xl bg-gray-100 text-gray-600 transition-colors group-hover:bg-blue-50 group-hover:text-[#0056B3]"
         >
           <Icon name={category.icon} className="text-[32px]" />
         </span>
         <span
-          className={`flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-semibold transition-colors ${
-            selected ? "bg-white text-[#0056B3] shadow-sm" : "bg-gray-100 text-gray-600"
-          }`}
+          className="flex items-center gap-1.5 rounded-full bg-gray-100 px-3.5 py-1.5 text-sm font-semibold text-gray-600 transition-colors group-hover:bg-blue-50 group-hover:text-[#003F87]"
         >
-          <Icon name={selected ? "check" : "touch_app"} className="text-[16px]" />
-          {selected ? "Terpilih" : "Pilih Kategori"}
+          <Icon name="touch_app" className="text-[16px]" />
+          Pilih Kategori
         </span>
       </span>
 
       <span className="flex flex-col gap-2">
         <span className="flex flex-wrap items-center gap-2">
           <span
-            className={`text-2xl font-semibold transition-colors ${
-              selected ? "text-white" : "text-gray-900"
-            }`}
+            className="text-2xl font-semibold text-gray-900 transition-colors"
           >
             {category.title}
           </span>
           <span
-            className={`rounded px-2 py-0.5 text-[11px] font-semibold uppercase transition-colors ${
-              selected ? "bg-white/20 text-white" : idleTag
-            }`}
+            className={`rounded px-2 py-0.5 text-[11px] font-semibold uppercase transition-colors ${idleTag}`}
           >
             {category.tag}
           </span>
         </span>
         <span
-          className={`block text-base leading-relaxed transition-colors ${
-            selected ? "text-blue-100" : "text-gray-600"
-          }`}
+          className="block text-base leading-relaxed text-gray-600 transition-colors"
         >
           {category.description}
         </span>
@@ -98,31 +78,13 @@ function BirthCategoryCard({
  * karena desain dan prosedurnya belum tersedia.
  */
 export default function BirthCategoryStep({
-  selected,
-  onSelect,
   onBack,
   onVerifyBayiKecil,
 }: BirthCategoryStepProps) {
   const [toast, setToast] = useState<ToastState | null>(null);
   const closeToast = useCallback(() => setToast(null), []);
 
-  function handleToggle(key: BirthCategoryKey) {
-    // Klik kartu yang sudah terpilih membatalkan pilihan.
-    onSelect(selected === key ? null : key);
-  }
-
-  function handleContinue() {
-    const category = birthCategories.find((item) => item.key === selected);
-
-    if (!category) {
-      setToast({
-        id: Date.now(),
-        icon: "warning",
-        message: "Silakan pilih salah satu kategori terlebih dahulu.",
-      });
-      return;
-    }
-
+  function handleSelect(category: BirthCategory) {
     if (category.key === "bayi-kecil") {
       onVerifyBayiKecil();
       return;
@@ -164,16 +126,12 @@ export default function BirthCategoryStep({
           <BirthCategoryCard
             key={category.key}
             category={category}
-            selected={selected === category.key}
-            onToggle={() => handleToggle(category.key)}
+            onSelect={() => handleSelect(category)}
           />
         ))}
       </div>
 
-      <StepNavigation
-        back={{ label: "Kembali", onClick: onBack }}
-        next={{ label: "Lanjutkan", onClick: handleContinue }}
-      />
+      <StepNavigation back={{ label: "Kembali", onClick: onBack }} />
 
       {toast && (
         <Toast key={toast.id} icon={toast.icon} onClose={closeToast}>

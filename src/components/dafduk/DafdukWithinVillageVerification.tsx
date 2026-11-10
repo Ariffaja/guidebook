@@ -226,9 +226,9 @@ export default function DafdukWithinVillageVerification({
     <div className="mx-auto w-full max-w-[1080px] pb-8">
         <Breadcrumb
           items={[
-            { label: "Pendaftaran Kependudukan" },
-            { label: "Pindah Keluar" },
-            { label: classificationTitle },
+            { label: "Pendaftaran Kependudukan", onClick: () => router.push("/dafduk") },
+            { label: "Pindah Keluar", onClick: () => router.push("/dafduk/pindah-keluar") },
+            { label: classificationTitle, onClick: () => router.push("/dafduk/pindah-keluar") },
             { label: "Verifikasi Berkas" },
           ]}
         />

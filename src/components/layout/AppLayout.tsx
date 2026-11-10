@@ -14,7 +14,7 @@ type AppLayoutProps = {
  */
 export default function AppLayout({ children, pageLabel }: AppLayoutProps) {
   return (
-    <div className="min-h-screen bg-[#F7F9FB] text-slate-800">
+    <div className="app-shell min-h-screen bg-[#F7F9FB] text-slate-800">
       <Sidebar />
       <div className="flex min-h-screen flex-col lg:pl-72">
         <Header pageLabel={pageLabel} />

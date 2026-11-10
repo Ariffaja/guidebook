@@ -7,7 +7,6 @@ import DeathCategoryStep from "./kematian/DeathCategoryStep";
 import DeathVerificationStep from "./kematian/DeathVerificationStep";
 import ServiceStep from "./ServiceStep";
 import type { CapilServiceKey } from "./services";
-import type { BirthCategoryKey } from "./kelahiran/categories";
 import { deathCategories, type DeathCategoryKey } from "./kematian/categories";
 
 type CapilView =
@@ -20,8 +19,6 @@ type CapilView =
 /** Pemegang state modul Capil: pilihan layanan, kategori, dan tahap yang tampil. */
 export default function CapilModule() {
   const [view, setView] = useState<CapilView>("layanan");
-  const [selected, setSelected] = useState<CapilServiceKey>("kematian");
-  const [birthCategory, setBirthCategory] = useState<BirthCategoryKey | null>(null);
   const [deathCategory, setDeathCategory] = useState<DeathCategoryKey | null>(null);
 
   const deathCategoryTitle =
@@ -34,8 +31,8 @@ export default function CapilModule() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  function handleContinue() {
-    goTo(selected === "kematian" ? "kategori-kematian" : "kategori-kelahiran");
+  function handleServiceSelect(service: CapilServiceKey) {
+    goTo(service === "kematian" ? "kategori-kematian" : "kategori-kelahiran");
   }
 
   function handleOpenDeathVerification(key: DeathCategoryKey) {
@@ -48,7 +45,7 @@ export default function CapilModule() {
       className={`mx-auto flex w-full flex-col pb-12 ${isWideView ? "max-w-none" : "max-w-[1080px]"}`}
     >
       {view === "layanan" && (
-        <ServiceStep selected={selected} onSelect={setSelected} onContinue={handleContinue} />
+        <ServiceStep onSelect={handleServiceSelect} />
       )}
       {view === "kategori-kematian" && (
         <DeathCategoryStep
@@ -65,8 +62,6 @@ export default function CapilModule() {
       )}
       {view === "kategori-kelahiran" && (
         <BirthCategoryStep
-          selected={birthCategory}
-          onSelect={setBirthCategory}
           onBack={() => goTo("layanan")}
           onVerifyBayiKecil={() => goTo("verifikasi-bayi-kecil")}
         />

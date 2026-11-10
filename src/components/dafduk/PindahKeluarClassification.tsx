@@ -56,7 +56,7 @@ export default function PindahKeluarClassification() {
     <div className="mx-auto flex w-full max-w-[1080px] flex-col pb-12">
       <Breadcrumb
         items={[
-          { label: "Pendaftaran Kependudukan" },
+          { label: "Pendaftaran Kependudukan", onClick: () => router.push("/dafduk") },
           { label: "Pindah Keluar" },
           { label: "Pilih Klasifikasi Pindah" },
         ]}

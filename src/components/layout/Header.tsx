@@ -1,3 +1,6 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Icon from "@/components/ui/Icon";
 
 type HeaderProps = {
@@ -6,8 +9,26 @@ type HeaderProps = {
 };
 
 export default function Header({ pageLabel }: HeaderProps) {
+  const [darkMode, setDarkMode] = useState(false);
+
+  useEffect(() => {
+    const savedTheme = window.localStorage.getItem("guidebook-theme");
+    const isDark = savedTheme === "dark";
+    setDarkMode(isDark);
+    document.documentElement.classList.toggle("dark", isDark);
+  }, []);
+
+  function toggleTheme() {
+    setDarkMode((currentMode) => {
+      const nextDarkMode = !currentMode;
+      document.documentElement.classList.toggle("dark", nextDarkMode);
+      window.localStorage.setItem("guidebook-theme", nextDarkMode ? "dark" : "light");
+      return nextDarkMode;
+    });
+  }
+
   return (
-    <header className="fixed left-0 right-0 top-0 z-40 flex h-16 items-center justify-between border-b border-slate-200/80 bg-white/90 px-4 shadow-sm backdrop-blur-md sm:px-8 lg:left-72">
+    <header className="app-header fixed left-0 right-0 top-0 z-40 flex h-16 items-center justify-between border-b border-slate-200/80 bg-white/90 px-4 shadow-sm backdrop-blur-md sm:px-8 lg:left-72">
       <div className="flex min-w-0 items-center gap-3">
         <span className="truncate text-base font-semibold text-slate-800 sm:text-lg">
           Guidebook: PLAVON ke SIAK
@@ -18,15 +39,17 @@ export default function Header({ pageLabel }: HeaderProps) {
         </span>
       </div>
 
-      {/* Kontrol visual saja (belum ada fungsi) sesuai referensi desain */}
       <div className="flex items-center gap-2">
         <button
           type="button"
-          title="Notifikasi"
-          aria-label="Notifikasi"
+          role="switch"
+          aria-checked={darkMode}
+          title={darkMode ? "Aktifkan mode terang" : "Aktifkan mode gelap"}
+          aria-label={darkMode ? "Beralih ke mode terang" : "Beralih ke mode gelap"}
+          onClick={toggleTheme}
           className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-800"
         >
-          <Icon name="notifications" className="text-[20px]" />
+          <Icon name={darkMode ? "light_mode" : "dark_mode"} className="text-[20px]" />
         </button>
         <button
           type="button"

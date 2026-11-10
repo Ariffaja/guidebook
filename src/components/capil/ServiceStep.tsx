@@ -5,13 +5,11 @@ import StepNavigation from "@/components/ui/StepNavigation";
 import { capilServices, type CapilServiceKey } from "./services";
 
 type ServiceStepProps = {
-  selected: CapilServiceKey;
   onSelect: (key: CapilServiceKey) => void;
-  onContinue: () => void;
 };
 
 /** Tahap 1 Capil: pilih Kematian atau Kelahiran. */
-export default function ServiceStep({ selected, onSelect, onContinue }: ServiceStepProps) {
+export default function ServiceStep({ onSelect }: ServiceStepProps) {
   return (
     <div className="flex w-full flex-col">
       <Breadcrumb items={[{ label: "Pencatatan Sipil" }, { label: "Pilih Layanan" }]} />
@@ -31,17 +29,14 @@ export default function ServiceStep({ selected, onSelect, onContinue }: ServiceS
             title={service.title}
             description={service.description}
             idleLabel="Pilih Kategori"
-            selected={selected === service.key}
+            selected={false}
             onSelect={() => onSelect(service.key)}
-            className="min-h-[280px]"
+            className="min-h-[280px] hover:-translate-y-1"
           />
         ))}
       </div>
 
-      <StepNavigation
-        back={{ label: "Kembali ke Beranda", href: "/" }}
-        next={{ label: "Lanjutkan", onClick: onContinue }}
-      />
+      <StepNavigation back={{ label: "Kembali ke Beranda", href: "/" }} />
     </div>
   );
 }
