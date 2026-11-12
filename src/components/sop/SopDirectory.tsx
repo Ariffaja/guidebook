@@ -30,9 +30,11 @@ export default function SopDirectory() {
   const [category, setCategory] = useState<CategoryFilter>("all");
   const [classification, setClassification] = useState<ClassificationFilter>("all");
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
   const [toast, setToast] = useState<ToastState | null>(null);
   const closeToast = useCallback(() => setToast(null), []);
   const detailRef = useRef<HTMLDivElement>(null);
+  const copyTimer = useRef<number | null>(null);
 
   const tokens = useMemo(() => tokenize(query), [query]);
   const filtered = useMemo(
@@ -48,6 +50,7 @@ export default function SopDirectory() {
 
   function handleSelect(id: string) {
     setSelectedId(id);
+    setCopiedId(null);
     // Pada layar sempit detail berada di bawah daftar, jadi gulir ke panel detail.
     if (window.innerWidth < SPLIT_LAYOUT_MIN_WIDTH) {
       detailRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -64,6 +67,12 @@ export default function SopDirectory() {
     if (!sopCase.template) return;
     try {
       await navigator.clipboard.writeText(sopCase.template);
+      setCopiedId(sopCase.id);
+      if (copyTimer.current !== null) window.clearTimeout(copyTimer.current);
+      copyTimer.current = window.setTimeout(() => {
+        setCopiedId((current) => (current === sopCase.id ? null : current));
+        copyTimer.current = null;
+      }, 1800);
       setToast({
         id: Date.now(),
         icon: "check_circle",
@@ -170,7 +179,11 @@ export default function SopDirectory() {
           />
         </div>
         <div ref={detailRef} className="scroll-mt-20 xl:sticky xl:top-20 xl:col-span-5">
-          <SopCaseDetail sopCase={selectedCase} onCopy={handleCopy} />
+          <SopCaseDetail
+            sopCase={selectedCase}
+            onCopy={handleCopy}
+            copied={selectedCase?.id === copiedId}
+          />
         </div>
       </div>
 

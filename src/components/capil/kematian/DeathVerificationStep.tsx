@@ -10,10 +10,10 @@ import {
   deathVerificationDocuments,
   type DeathDocumentSelection,
 } from "./deathVerificationData";
-import { TOTAL_DEATH_DOCUMENTS, evaluateAll } from "./deathVerificationLogic";
+import { evaluateAll } from "./deathVerificationLogic";
 
 type DeathVerificationStepProps = {
-  /** Judul kategori terpilih untuk breadcrumb (contoh: "KTP-el Modern"). */
+  /** Judul kategori terpilih untuk breadcrumb (contoh: "KTP-el"). */
   categoryTitle: string;
   onBackToService: () => void;
   onBackToCategory: () => void;
@@ -52,11 +52,6 @@ export default function DeathVerificationStep({
     }
   }
 
-  function handleContinue() {
-    // Placeholder: tahap berikutnya belum didefinisikan pada sumber desain.
-    setToast({ id: Date.now(), icon: "info", message: "Tahap berikutnya belum tersedia pada panduan ini." });
-  }
-
   return (
     <div className="flex w-full flex-col pb-16">
       <Breadcrumb
@@ -68,56 +63,13 @@ export default function DeathVerificationStep({
         ]}
       />
 
-      <div className="mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-center">
-        <div className="flex flex-col gap-2">
-          <h1 className="text-2xl font-semibold tracking-tight text-[#191c1e] sm:text-[32px] sm:leading-10">
-            Verifikasi Berkas Kematian
-          </h1>
-          <p className="max-w-3xl text-base text-[#424752]">
-            Periksa kesesuaian data dan lampiran pada setiap dokumen untuk menentukan status
-            pemeriksaan.
-          </p>
-        </div>
-
-        <div className="flex shrink-0 items-center gap-4 self-start rounded-lg border-l-4 border-[#003F87] bg-white p-4 shadow-sm md:self-auto">
-          <div
-            role="progressbar"
-            aria-label="Progres verifikasi"
-            aria-valuemin={0}
-            aria-valuemax={100}
-            aria-valuenow={evaluation.percent}
-            className="relative flex h-12 w-12 items-center justify-center"
-          >
-            <svg className="h-12 w-12 -rotate-90 transform" viewBox="0 0 36 36" aria-hidden="true">
-              <path
-                className="text-[#e6e8ea]"
-                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="3.5"
-              />
-              <path
-                className="text-[#006a6a] transition-all duration-500 ease-out"
-                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                fill="none"
-                stroke="currentColor"
-                strokeDasharray={`${evaluation.percent}, 100`}
-                strokeLinecap="round"
-                strokeWidth="3.5"
-              />
-            </svg>
-            <span className="absolute text-[11px] font-bold text-[#191c1e]">{evaluation.percent}%</span>
-          </div>
-          <div className="flex flex-col">
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-[#424752]">
-              Progres Verifikasi
-            </span>
-            <span className="text-base font-bold leading-tight text-[#191c1e]">
-              {evaluation.completedCount} dari {TOTAL_DEATH_DOCUMENTS} dokumen diperiksa
-            </span>
-            <span className="mt-0.5 text-xs text-[#727784]">Seluruh berkas wajib dievaluasi</span>
-          </div>
-        </div>
+      <div className="mb-5 flex flex-col gap-1.5">
+        <h1 className="text-2xl font-semibold tracking-tight text-[#191c1e] sm:text-[32px] sm:leading-10">
+          Verifikasi Berkas: {categoryTitle}
+        </h1>
+        <p className="max-w-3xl text-sm text-[#424752]">
+          Pilih kondisi data dan lampiran untuk setiap dokumen. Status serta arahan operator akan diperbarui otomatis.
+        </p>
       </div>
 
       <div className="grid grid-cols-1 items-start gap-8 xl:grid-cols-12">
@@ -142,28 +94,14 @@ export default function DeathVerificationStep({
         </div>
       </div>
 
-      <div className="mt-10 flex flex-col items-center justify-between gap-4 rounded-lg bg-white p-5 shadow-sm sm:flex-row">
+      <div className="mt-6 border-t border-[#e0e3e5] pt-4">
         <button
           type="button"
           onClick={onBackToCategory}
-          className="flex items-center gap-2 rounded bg-[#eceef0] px-4 py-2.5 text-sm font-semibold text-[#191c1e] transition-colors hover:bg-[#e6e8ea] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0056B3]"
+          className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-[12px] font-medium text-[#424752] transition-colors hover:bg-[#e6e8ea] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0056B3]"
         >
           <Icon name="arrow_back" className="text-[18px]" />
-          <span>Kembali ke Kategori Kematian</span>
-        </button>
-
-        <div className="flex items-center gap-2 text-center text-sm text-[#424752]">
-          <Icon name="shield" className="text-[18px] text-[#006a6a]" />
-          <span>Pastikan seluruh berkas telah ditelaah dengan teliti</span>
-        </div>
-
-        <button
-          type="button"
-          onClick={handleContinue}
-          className="flex items-center gap-2 rounded bg-[#0056B3] px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-[#003F87] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0056B3]"
-        >
-          <span>Lanjutkan</span>
-          <Icon name="arrow_forward" className="text-[18px]" />
+          <span>Kembali ke Kategori KTP-el</span>
         </button>
       </div>
 

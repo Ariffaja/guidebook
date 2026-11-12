@@ -11,7 +11,6 @@ const classifications = [
     key: "dalam-desa-kelurahan",
     icon: "person_pin_circle",
     title: "Dalam Satu Desa / Kelurahan",
-    tag: "Tingkat Desa / RT/RW",
     description:
       "Perpindahan alamat antar RT/RW dalam satu desa atau kelurahan yang sama. Tidak memerlukan penerbitan SKPWNI, cukup pembaruan elemen KK.",
   },
@@ -19,7 +18,6 @@ const classifications = [
     key: "antar-desa-kelurahan",
     icon: "alt_route",
     title: "Antar Desa / Kelurahan",
-    tag: "Dalam Satu Kecamatan",
     description:
       "Perpindahan penduduk dari satu desa/kelurahan ke desa/kelurahan lain yang masih dalam lingkup satu kecamatan yang sama.",
   },
@@ -27,7 +25,6 @@ const classifications = [
     key: "antar-kecamatan",
     icon: "location_city",
     title: "Antar Kecamatan",
-    tag: "Dalam Satu Kab / Kota",
     description:
       "Perpindahan domisili dari satu kecamatan ke kecamatan lain di wilayah kabupaten/kota yang sama.",
   },
@@ -35,7 +32,6 @@ const classifications = [
     key: "antar-kabupaten-kota",
     icon: "location_on",
     title: "Antar Kabupaten / Kota",
-    tag: "Dalam Satu Provinsi",
     description:
       "Perpindahan domisili antar kabupaten atau kota yang masih berada dalam satu wilayah provinsi yang sama.",
   },
@@ -43,7 +39,6 @@ const classifications = [
     key: "antar-provinsi",
     icon: "public",
     title: "Antar Provinsi",
-    tag: "Lintas Provinsi Nasional",
     description:
       "Perpindahan penduduk lintas batas provinsi di seluruh wilayah NKRI. Memerlukan penyesuaian database kependudukan nasional.",
   },
@@ -82,12 +77,7 @@ export default function PindahKeluarClassification() {
               <Icon name={item.icon} className="text-[21px]" />
             </span>
             <span className="min-w-0 flex-1">
-              <span className="flex flex-wrap items-center gap-2">
-                <span className="text-[14px] font-bold text-[#191c1e]">{item.title}</span>
-                <span className="rounded bg-[#e6e8ea] px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-[#424752]">
-                  {item.tag}
-                </span>
-              </span>
+              <span className="block text-[14px] font-bold text-[#191c1e]">{item.title}</span>
               <span className="block text-[11px] leading-relaxed text-[#424752]">{item.description}</span>
             </span>
             <Icon

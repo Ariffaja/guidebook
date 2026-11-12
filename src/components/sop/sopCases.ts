@@ -30,6 +30,7 @@ Kelengkapan berkas kami tunggu sampai besok tanggal 28 Oktober 2026`,
     id: "dafduk-02",
     category: "dafduk",
     title: "Sertifikat Belum Balik Nama / Nama Orang Lain",
+    classification: "BTL",
     template: `Terima kasih telah menggunakan layanan Plavon Dukcapil
 
 Dikarenakan sertifikat rumah belum dibalik nama , Mohon untuk melampirkan Surat Pernyataan Tidak Keberatan Alamat Rumah Digunakan Sebagai Alamat Dokumen Kependudukan bermaterai 10.000
@@ -149,6 +150,7 @@ Terimakasih`,
     id: "dafduk-13",
     category: "dafduk",
     title: "Sudah Pernah Diajukan",
+    classification: "TDP",
     template: `Terima kasih telah menggunakan layanan Plavon Dukcapil.
 
 Pengajuan tidak dapat di proses karena data tersebut sudah pernah diajukan dan berstatus selesai.
@@ -159,9 +161,10 @@ Berkas bisa diambil oleh yang bersangkutan atau yang berada dalam 1 Kartu Keluar
     id: "dafduk-14",
     category: "dafduk",
     title: "Anggota Keluarga Tinggalan Dibawah Umur",
+    classification: "BTL",
     template: `Terima kasih telah menggunakan layanan Plavon Dukcapil
 
-Mohon untuk melakukan tumpang kartu keluarga terlebih dahulu untuk anggota keluarga yang bernama INDRI ZIE ZIE RAHMAWATI dikarenakan anak dibawah umur 17 tahun tidak bisa menjadi kepala keluarga
+Mohon untuk melakukan tumpang kartu keluarga terlebih dahulu untuk anggota keluarga yang bernama ______ dikarenakan anak dibawah umur 17 tahun tidak bisa menjadi kepala keluarga
 
 Terimakasih`,
   },
@@ -169,6 +172,7 @@ Terimakasih`,
     id: "dafduk-15",
     category: "dafduk",
     title: "Data Pemohon Bukan Diri Sendiri/Suami/Istri",
+    classification: "TDP",
     template: `Terima kasih telah menggunakan layanan Plavon Dukcapil
 
 Mohon melakukan perbaikan data pemohon menggunakan nama dan KK istri, karena yang mengajukan perpindahan adalah istri, bukan suami.
@@ -180,7 +184,7 @@ Terimakasih`,
     category: "capil",
     ref: "Kasus 1.1",
     title: "KTP-el Almarhum/Almarhumah Fotokopi",
-    classification: "Perbaikan Berkas",
+    classification: "BTL",
     template: `Terima kasih telah menggunakan layanan Plavon Dukcapil.
 
 Mohon maaf, permohonan Anda belum dapat diproses dikarenakan dokumen KTP-el almarhum/almarhumah yang diunggah belum berupa dokumen asli. Mohon melampirkan kembali foto KTP-el almarhum/almarhumah dalam bentuk fisik asli.
@@ -192,7 +196,7 @@ Kelengkapan berkas kami tunggu paling lambat besok pukul 12.00 WIB. Terima kasih
     category: "capil",
     ref: "Kasus 1.2",
     title: "Dokumen KTP-el Almarhum/Almarhumah Tertukar (Terunggah KK)",
-    classification: "Perbaikan Berkas",
+    classification: "BTL",
     template: `Terima kasih telah menggunakan layanan Plavon Dukcapil.
 
 Mohon maaf, permohonan Anda belum dapat diproses dikarenakan dokumen KTP-el almarhum/almarhumah yang terunggah tidak sesuai (terlampir berkas Kartu Keluarga). Mohon melampirkan foto dokumen KTP-el asli milik almarhum/almarhumah (bukan fotokopi).
@@ -204,7 +208,7 @@ Kelengkapan berkas kami tunggu paling lambat besok pukul 12.00 WIB. Terima kasih
     category: "capil",
     ref: "Kasus 1.3",
     title: "Dokumen KTP-el Almarhum/Almarhumah Tidak Sesuai/Tertukar",
-    classification: "Perbaikan Berkas",
+    classification: "BTL",
     template: `Terima kasih telah menggunakan layanan Plavon Dukcapil.
 
 Mohon maaf, permohonan Anda belum dapat diproses dikarenakan dokumen KTP-el almarhum/almarhumah yang diunggah tidak sesuai (bukan foto KTP-el milik almarhum/almarhumah). Mohon melampirkan kembali foto KTP-el asli milik almarhum/almarhumah.
@@ -216,7 +220,7 @@ Kelengkapan berkas kami tunggu paling lambat besok pukul 12.00 WIB. Terima kasih
     category: "capil",
     ref: "Kasus 1.4",
     title: "Surat Keterangan Kematian Berupa Fotokopi",
-    classification: "Perbaikan Berkas",
+    classification: "BTL",
     template: `Terima kasih telah menggunakan layanan Plavon Dukcapil.
 
 Mohon maaf, permohonan Anda belum dapat diproses dikarenakan dokumen Surat Keterangan Kematian yang diunggah masih berupa fotokopi. Mohon melampirkan kembali foto Surat Keterangan Kematian asli (apabila meninggal di Rumah Sakit, wajib melampirkan Surat Keterangan Kematian asli yang diterbitkan oleh pihak Rumah Sakit).
@@ -228,7 +232,7 @@ Kelengkapan berkas kami tunggu paling lambat besok pukul 12.00 WIB. Terima kasih
     category: "capil",
     ref: "Kasus 1.5",
     title: "Surat Keterangan Kematian Tidak Mencantumkan Tempat Kematian",
-    classification: "Perbaikan Berkas",
+    classification: "BTL",
     template: `Terima kasih telah menggunakan layanan Plavon Dukcapil.
 
 Mohon maaf, permohonan Anda belum dapat diproses dikarenakan dokumen Surat Keterangan Kematian asli dari Desa/Kelurahan belum mencantumkan keterangan tempat meninggalnya almarhum/almarhumah. Mohon memperbarui dan mengunggah kembali Surat Keterangan Kematian asli yang telah mencantumkan lokasi tempat meninggal secara jelas.
@@ -240,7 +244,7 @@ Kelengkapan berkas kami tunggu paling lambat besok pukul 12.00 WIB. Terima kasih
     category: "capil",
     ref: "Kasus 1.6",
     title: "Surat Keterangan Kematian Belum Dilampirkan (Opsi Rumah vs Rumah Sakit)",
-    classification: "Perbaikan Berkas",
+    classification: "BTL",
     template: `Terima kasih telah menggunakan layanan Plavon Dukcapil.
 
 Mohon maaf, permohonan Anda belum dapat diproses dikarenakan berkas belum lengkap. Mohon melampirkan foto dokumen Surat Keterangan Kematian asli dengan ketentuan:
@@ -254,7 +258,7 @@ Kelengkapan berkas kami tunggu paling lambat besok pukul 12.00 WIB. Terima kasih
     category: "capil",
     ref: "Kasus 1.7",
     title: "Kartu Keluarga (KK) Fotokopi / KK Asli Hilang",
-    classification: "Perbaikan Berkas",
+    classification: "BTL",
     template: `Terima kasih telah menggunakan layanan Plavon Dukcapil.
 
 Mohon maaf, permohonan Anda belum dapat diproses. Sesuai dengan ketentuan pelayanan Adminduk secara daring, dokumen pendukung yang diunggah wajib berupa foto/pemindaian (scan) dari dokumen asli. Mohon mengunggah kembali foto asli dari Kartu Keluarga (KK) almarhum/almarhumah.
@@ -268,7 +272,7 @@ Kelengkapan berkas kami tunggu paling lambat besok pukul 12.00 WIB. Terima kasih
     category: "capil",
     ref: "Kasus 1.8",
     title: "Kombinasi: Surat Kematian Tidak Sesuai & KK Fotokopi / Hilang",
-    classification: "Perbaikan Berkas",
+    classification: "BTL",
     template: `Terima kasih telah menggunakan layanan Plavon Dukcapil.
 
 Mohon maaf, permohonan Anda belum dapat diproses dikarenakan dokumen kelengkapan belum sesuai ketentuan:
@@ -282,7 +286,7 @@ Kelengkapan berkas kami tunggu paling lambat besok pukul 12.00 WIB. Terima kasih
     category: "capil",
     ref: "Kasus 2.1",
     title: "Data Pelapor dan Saksi Sama / KTP Sama",
-    classification: "Penolakan",
+    classification: "TDP",
     template: `Terima kasih telah menggunakan layanan Plavon Dukcapil.
 
 Mohon maaf, permohonan Anda tidak dapat diproses dikarenakan data KTP-el pelapor dan data KTP-el saksi terdaftar atas individu yang sama. Sesuai ketentuan, pihak saksi wajib merupakan orang yang berbeda dari pelapor.
@@ -294,7 +298,7 @@ Mohon melakukan pengajuan permohonan kembali dari awal dengan melampirkan foto K
     category: "capil",
     ref: "Kasus 2.2",
     title: "Pelapor Bukan Ahli Waris Sah",
-    classification: "Penolakan",
+    classification: "TDP",
     template: `Terima kasih telah menggunakan layanan Plavon Dukcapil.
 
 Mohon maaf, permohonan Anda tidak dapat diproses dikarenakan data KTP-el pelapor yang terlampir bukan merupakan ahli waris yang sah dari almarhum/almarhumah. Sesuai ketentuan, pelapor wajib merupakan pasangan (suami/istri), anak kandung, atau saudara kandung dari almarhum/almarhumah.
@@ -306,7 +310,7 @@ Mohon melakukan pengajuan permohonan kembali dari awal dengan menggunakan data K
     category: "capil",
     ref: "Kasus 2.3",
     title: "Belum Melakukan Perekaman KTP-el",
-    classification: "Penolakan",
+    classification: "TDP",
     template: `Terima kasih telah menggunakan layanan Plavon Dukcapil.
 
 Mohon maaf, permohonan Anda tidak dapat diproses dikarenakan pemohon/anggota keluarga terdata belum melakukan perekaman KTP-el. Sesuai ketentuan, seluruh dokumen kependudukan memerlukan status perekaman KTP-el yang sudah aktif.
@@ -318,7 +322,7 @@ Mohon melakukan perekaman KTP-el terlebih dahulu di kantor Kecamatan domisili at
     category: "capil",
     ref: "Kasus 2.4",
     title: "Duplikasi Pengajuan / Akta Kematian Sudah Pernah Terbit",
-    classification: "Penolakan",
+    classification: "TDP",
     template: `Terima kasih telah menggunakan layanan Plavon Dukcapil.
 
 Mohon maaf, permohonan Anda tidak dapat diproses dikarenakan data almarhum/almarhumah terdaftar sudah pernah diajukan dan/atau sudah diterbitkan Akta Kematian sebelumnya dalam sistem kami.

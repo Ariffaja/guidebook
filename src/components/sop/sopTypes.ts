@@ -1,6 +1,6 @@
 export type SopCategory = "dafduk" | "capil";
 
-export type SopClassification = "BTL" | "TDP" | "Penolakan" | "Perbaikan Berkas";
+export type SopClassification = "BTL" | "TDP";
 
 /** Satu catatan kasus beserta templat responsnya. */
 export type SopCase = {
@@ -40,10 +40,8 @@ export type SopClassificationMeta = {
   badgeClass: string;
 };
 
-/** Urutan chip filter mengikuti brief: BTL, TDP, Penolakan, Perbaikan Berkas. */
+/** Filter klasifikasi untuk SOP Dafduk dan Capil. */
 export const sopClassifications: SopClassificationMeta[] = [
   { value: "BTL", hint: "Berkas Tidak Lengkap", badgeClass: "bg-[#ffdbcc] text-[#351000]" },
   { value: "TDP", hint: "Tidak Dapat Diproses", badgeClass: "bg-[#ffdad6] text-[#93000a]" },
-  { value: "Penolakan", badgeClass: "border border-[#ba1a1a]/60 bg-white text-[#93000a]" },
-  { value: "Perbaikan Berkas", badgeClass: "bg-[#d7e2ff] text-[#001a40]" },
 ];

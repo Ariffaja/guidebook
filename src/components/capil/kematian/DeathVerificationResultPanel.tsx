@@ -10,65 +10,49 @@ import {
 
 const statusConfig: Record<
   DeathOverallStatus,
-  { box: string; icon: string; iconClass: string; headline: string; headlineClass: string; desc: string }
+  { icon: string; badge: string; box: string; headline: string; description: string }
 > = {
   menunggu: {
+    icon: "info",
+    badge: "bg-[#eceef0] text-[#424752]",
     box: "bg-[#f2f4f6]",
-    icon: "more_horiz",
-    iconClass: "text-[#727784]",
-    headline: "Menunggu Kelengkapan Berkas",
-    headlineClass: "font-semibold text-[#191c1e]",
-    desc: "",
+    headline: "MENUNGGU PILIHAN",
+    description: "Pilih kondisi data dan lampiran untuk menentukan hasil pemeriksaan.",
   },
   siap: {
-    box: "bg-[#90efef] text-[#006e6e]",
     icon: "check_circle",
-    iconClass: "text-[#006a6a]",
+    badge: "bg-[#90efef] text-[#006e6e]",
+    box: "bg-[#e4f8f6]",
     headline: "SIAP DIVERIFIKASI",
-    headlineClass: "font-bold text-[#006a6a]",
-    desc: "Seluruh enam dokumen telah memenuhi kriteria pemeriksaan awal dan dapat ditindaklanjuti operator sesuai prosedur yang berlaku.",
+    description: "Seluruh berkas memenuhi kriteria pemeriksaan awal.",
   },
   btl: {
-    box: "bg-[#ffdbcc] text-[#351000]",
     icon: "pending_actions",
-    iconClass: "text-[#722b00]",
+    badge: "bg-[#ffdbcc] text-[#722b00]",
+    box: "bg-[#fff5ef]",
     headline: "BERKAS TIDAK LENGKAP (BTL)",
-    headlineClass: "font-bold text-[#722b00]",
-    desc: "Terdapat lampiran buram atau rincian yang perlu perbaikan pemohon.",
+    description: "Terdapat berkas yang perlu diperbaiki atau dilengkapi.",
   },
   tdp: {
-    box: "bg-[#ffdad6] text-[#93000a]",
     icon: "cancel",
-    iconClass: "text-[#ba1a1a]",
+    badge: "bg-[#ffdad6] text-[#93000a]",
+    box: "bg-[#fff1f0]",
     headline: "TIDAK DAPAT DIPROSES (TDP)",
-    headlineClass: "font-bold text-[#ba1a1a]",
-    desc: "Ditemukan data yang tidak sesuai SIAK atau berkas salah unggah.",
+    description: "Ditemukan data yang tidak sesuai SIAK atau berkas salah unggah.",
   },
 };
-
-const categories: {
-  status: Exclude<DeathOverallStatus, "menunggu">;
-  icon: string;
-  iconClass: string;
-  label: string;
-  activeBg: string;
-}[] = [
-  { status: "siap", icon: "check_circle", iconClass: "text-[#006a6a]", label: "Siap Diverifikasi", activeBg: "bg-[#90efef]" },
-  { status: "btl", icon: "pending_actions", iconClass: "text-[#722b00]", label: "BTL (Perbaikan)", activeBg: "bg-[#ffdbcc]" },
-  { status: "tdp", icon: "cancel", iconClass: "text-[#ba1a1a]", label: "TDP (Tolak)", activeBg: "bg-[#ffdad6]" },
-];
 
 const checklistConfig: Record<
   DeathDocumentResult,
-  { icon: string; iconClass: string; label: string; labelClass: string; item: string }
+  { icon: string; iconClass: string; label: string; labelClass: string }
 > = {
-  pending: { icon: "radio_button_unchecked", iconClass: "text-[#727784]", label: "Menunggu", labelClass: "text-[#424752]", item: "bg-[#f2f4f6]" },
-  valid: { icon: "check_circle", iconClass: "text-[#006a6a]", label: "Sesuai", labelClass: "font-bold text-[#006a6a]", item: "bg-[#eceef0]" },
-  tolak: { icon: "cancel", iconClass: "text-[#ba1a1a]", label: "Tolak", labelClass: "font-bold text-[#ba1a1a]", item: "bg-[#e6e8ea]" },
-  perbaikan: { icon: "pending", iconClass: "text-[#722b00]", label: "Perbaikan (BTL)", labelClass: "font-bold text-[#722b00]", item: "bg-[#e6e8ea]" },
+  pending: { icon: "radio_button_unchecked", iconClass: "text-[#727784]", label: "Menunggu", labelClass: "text-[#424752]" },
+  valid: { icon: "check_circle", iconClass: "text-[#006a6a]", label: "Sesuai", labelClass: "font-semibold text-[#006a6a]" },
+  tolak: { icon: "cancel", iconClass: "text-[#ba1a1a]", label: "Tolak", labelClass: "font-semibold text-[#ba1a1a]" },
+  perbaikan: { icon: "pending", iconClass: "text-[#722b00]", label: "BTL", labelClass: "font-semibold text-[#722b00]" },
 };
 
-const sectionLabel = "text-[11px] font-bold uppercase tracking-wider text-[#424752]";
+const sectionLabel = "text-[10px] font-bold uppercase tracking-wider text-[#657181]";
 
 type DeathVerificationResultPanelProps = {
   documents: DeathVerificationDocument[];
@@ -76,125 +60,82 @@ type DeathVerificationResultPanelProps = {
   onCopy: (text: string) => void;
 };
 
-/** Panel kanan: status sistem, kategori, template arahan, dan checklist dokumen. */
+/** Ringkasan pemeriksaan, status otomatis, checklist, dan template arahan operator. */
 export default function DeathVerificationResultPanel({
   documents,
   evaluation,
   onCopy,
 }: DeathVerificationResultPanelProps) {
   const config = statusConfig[evaluation.status];
-  const remaining = TOTAL_DEATH_DOCUMENTS - evaluation.completedCount;
-  const description =
-    evaluation.status === "menunggu"
-      ? evaluation.completedCount === 0
-        ? "Lengkapi kondisi pemeriksaan dokumen untuk melihat hasil."
-        : `Lengkapi ${remaining} berkas tersisa untuk menentukan status akhir.`
-      : config.desc;
   const directive = buildDirective(evaluation);
 
   return (
-    <div className="flex flex-col gap-5 xl:sticky xl:top-20">
-      <div className="flex flex-col gap-5 rounded-lg bg-white p-6 shadow-sm">
-        <div className="flex flex-col gap-1 pb-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              <Icon name="fact_check" className="text-[24px] text-[#003F87]" />
-              <h2 className="text-2xl font-semibold text-[#191c1e]">Hasil Pemeriksaan</h2>
-            </div>
-            <span className="rounded bg-[#eceef0] px-2 py-0.5 font-mono text-[11px] text-[#424752]">
-              AUTO-DETECTION
-            </span>
-          </div>
-          <span className="text-[13px] text-[#424752]">
-            Deteksi sistem otomatis sesuai kombinasi berkas. Sistem mendeteksi status berdasarkan
-            kombinasi kondisi input dan gambar pada keenam berkas.
+    <aside className="xl:sticky xl:top-20">
+      <section className="flex flex-col gap-4 rounded-xl border border-[#e4e8ed] bg-white p-4 shadow-sm">
+        <div className="flex items-center justify-between gap-2">
+          <span className={sectionLabel}>Status Verifikasi</span>
+          <span className={`inline-flex items-center gap-1 rounded-md px-2.5 py-1 text-[10px] font-bold ${config.badge}`}>
+            <Icon name={config.icon} className="text-[13px]" />
+            {config.headline}
           </span>
         </div>
 
-        <div className="flex flex-col gap-2">
-          <span className={sectionLabel}>STATUS SISTEM TERDETEKSI</span>
-          <div
-            role="status"
-            aria-live="polite"
-            className={`flex items-start gap-3 rounded-lg p-4 transition-all duration-300 ${config.box}`}
-          >
-            <Icon name={config.icon} className={`mt-0.5 text-[24px] ${config.iconClass}`} />
-            <div className="flex flex-col gap-0.5">
-              <span className={`text-[15px] ${config.headlineClass}`}>{config.headline}</span>
-              <span className="text-[13px] text-[#424752]">{description}</span>
-            </div>
-          </div>
+        <div role="status" aria-live="polite" className={`rounded-lg p-3 text-[12px] leading-relaxed text-[#424752] ${config.box}`}>
+          {config.description}
         </div>
 
         <div className="flex flex-col gap-2">
-          <span className={sectionLabel}>Kategori Status Sistem</span>
-          <div className="grid grid-cols-3 gap-2">
-            {categories.map((category) => {
-              const active = evaluation.status === category.status;
-              return (
-                <div
-                  key={category.status}
-                  className={`rounded p-2.5 text-center transition-all ${
-                    active ? `${category.activeBg} font-bold` : "bg-[#eceef0] opacity-40"
-                  }`}
-                >
-                  <Icon
-                    name={category.icon}
-                    className={`mx-auto mb-1 block text-[18px] ${category.iconClass}`}
-                  />
-                  <span className="block text-[11px] font-semibold leading-tight text-[#191c1e]">
-                    {category.label}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        <div className="flex flex-col gap-2">
-          <div className="flex items-center justify-between">
-            <span className={sectionLabel}>Template Arahan Pesan Operator</span>
-            <button
-              type="button"
-              onClick={() => onCopy(directive)}
-              className="flex items-center gap-1 text-[11px] font-semibold text-[#003F87] hover:text-[#0056B3] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0056B3]"
-            >
-              <Icon name="content_copy" className="text-[14px]" /> Salin
-            </button>
-          </div>
-          <div className="min-h-[96px] select-all whitespace-pre-wrap rounded bg-[#f2f4f6] p-3.5 font-mono text-xs leading-relaxed text-[#424752]">
-            {directive}
-          </div>
-        </div>
-
-        <div className="flex flex-col gap-2 pt-2">
-          <div className="mb-1 flex items-center justify-between">
-            <span className={sectionLabel}>Checklist Verifikasi 6 Dokumen</span>
-            <span className="font-mono text-[11px] font-bold text-[#003F87]">
-              {evaluation.completedCount} / {TOTAL_DEATH_DOCUMENTS} DIPERIKSA
+          <div className="flex items-center justify-between gap-2">
+            <span className={sectionLabel}>Pemeriksaan Lampiran</span>
+            <span className="text-[10px] font-semibold text-[#424752]">
+              {evaluation.completedCount} / {TOTAL_DEATH_DOCUMENTS} diperiksa
             </span>
           </div>
-          <ul className="flex flex-col gap-2">
+          <div
+            role="progressbar"
+            aria-label="Progres pemeriksaan dokumen"
+            aria-valuemin={0}
+            aria-valuemax={TOTAL_DEATH_DOCUMENTS}
+            aria-valuenow={evaluation.completedCount}
+            className="h-1.5 overflow-hidden rounded-full bg-[#eceef0]"
+          >
+            <div
+              className="h-full rounded-full bg-[#0056B3] transition-all duration-300"
+              style={{ width: `${evaluation.percent}%` }}
+            />
+          </div>
+          <ul className="flex flex-col gap-1.5">
             {documents.map((doc, index) => {
               const item = checklistConfig[evaluation.results[index]];
               return (
-                <li
-                  key={doc.id}
-                  className={`flex items-center justify-between rounded p-2 transition-colors ${item.item}`}
-                >
-                  <div className="flex items-center gap-2.5">
-                    <Icon name={item.icon} className={`text-[18px] ${item.iconClass}`} />
-                    <span className="text-[13px] text-[#191c1e]">
-                      {doc.id}. {doc.checklistLabel}
-                    </span>
-                  </div>
-                  <span className={`text-[11px] font-semibold ${item.labelClass}`}>{item.label}</span>
+                <li key={doc.id} className="flex items-center justify-between gap-2 rounded-md bg-[#f2f4f6] px-2.5 py-2">
+                  <span className="flex min-w-0 items-center gap-2">
+                    <Icon name={item.icon} className={`shrink-0 text-[15px] ${item.iconClass}`} />
+                    <span className="truncate text-[11px] text-[#191c1e]">{doc.checklistLabel}</span>
+                  </span>
+                  <span className={`shrink-0 text-[10px] ${item.labelClass}`}>{item.label}</span>
                 </li>
               );
             })}
           </ul>
         </div>
-      </div>
-    </div>
+
+        <div className="border-t border-[#e4e8ed] pt-3">
+          <div className="mb-2 flex items-center justify-between gap-2">
+            <span className={sectionLabel}>Template Arahan Operator</span>
+            <button
+              type="button"
+              onClick={() => onCopy(directive)}
+              className="inline-flex shrink-0 items-center gap-1 text-[10px] font-medium text-[#0056B3] transition-colors hover:text-[#003F87] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0056B3]"
+            >
+              <Icon name="content_copy" className="text-[13px]" /> Salin Pesan
+            </button>
+          </div>
+          <div className="max-h-64 overflow-y-auto whitespace-pre-wrap rounded-lg border border-[#e7eaee] bg-[#f8f9fa] p-3 text-[10px] leading-relaxed text-[#424752]">
+            {directive}
+          </div>
+        </div>
+      </section>
+    </aside>
   );
 }

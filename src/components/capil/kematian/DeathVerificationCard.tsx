@@ -10,54 +10,55 @@ import {
 } from "./deathVerificationData";
 import type { DeathDocumentResult } from "./deathVerificationLogic";
 
-const badgeConfig: Record<DeathDocumentResult, { label: string; badge: string; dot: string }> = {
-  pending: { label: "Belum Lengkap", badge: "bg-[#eceef0] text-[#424752] font-medium", dot: "bg-[#727784]" },
-  valid: { label: "Lengkap & Valid", badge: "bg-[#90efef] text-[#006e6e] font-semibold", dot: "bg-[#006a6a]" },
-  tolak: { label: "Tidak Memenuhi", badge: "bg-[#ffdad6] text-[#93000a] font-semibold", dot: "bg-[#ba1a1a]" },
-  perbaikan: { label: "Perlu Perbaikan", badge: "bg-[#ffdbcc] text-[#351000] font-semibold", dot: "bg-[#722b00]" },
+const badgeConfig: Record<DeathDocumentResult, { label: string; badge: string }> = {
+  pending: { label: "Belum Lengkap", badge: "bg-[#eceef0] text-[#424752]" },
+  valid: { label: "Lengkap & Valid", badge: "bg-[#90efef] text-[#006e6e]" },
+  tolak: { label: "Tidak Memenuhi", badge: "bg-[#ffdad6] text-[#93000a]" },
+  perbaikan: { label: "Perlu Perbaikan", badge: "bg-[#ffdbcc] text-[#722b00]" },
 };
 
-const selectClass =
-  "w-full cursor-pointer appearance-none rounded bg-white px-3.5 py-2.5 pr-10 text-sm text-[#191c1e] shadow-sm focus:outline-none focus:ring-2 focus:ring-[#003F87]/40";
-
-function ConditionSelect<T extends string>({
-  id,
+function ConditionRadioGroup<T extends string>({
+  name,
   label,
   value,
   options,
   onChange,
 }: {
-  id: string;
+  name: string;
   label: string;
   value: T | "";
   options: ConditionOption<T>[];
-  onChange: (value: T | "") => void;
+  onChange: (value: T) => void;
 }) {
   return (
-    <>
-      <label htmlFor={id} className="text-[13px] font-medium text-[#424752]">
+    <fieldset className="flex min-w-0 flex-col gap-1.5">
+      <legend className="mb-1 text-[10px] font-bold uppercase tracking-wide text-[#59616d]">
         {label}
-      </label>
-      <div className="relative">
-        <select
-          id={id}
-          className={selectClass}
-          value={value}
-          onChange={(event) => onChange(event.target.value as T | "")}
-        >
-          <option value="">Pilih kondisi</option>
-          {options.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
-        <Icon
-          name="expand_more"
-          className="pointer-events-none absolute right-3 top-2.5 text-[20px] text-[#727784]"
-        />
-      </div>
-    </>
+      </legend>
+      {options.map((option) => {
+        const selected = value === option.value;
+        return (
+          <label
+            key={option.value}
+            className={`flex cursor-pointer items-center gap-2 rounded-md border px-2.5 py-2 text-[12px] leading-snug transition-colors ${
+              selected
+                ? "border-[#9db6d4] bg-[#f2f6fb] text-[#191c1e]"
+                : "border-[#e7eaee] bg-white text-[#424752] hover:border-[#b8c9df]"
+            }`}
+          >
+            <input
+              type="radio"
+              name={name}
+              value={option.value}
+              checked={selected}
+              onChange={() => onChange(option.value)}
+              className="h-4 w-4 shrink-0 accent-[#0056B3]"
+            />
+            <span>{option.label}</span>
+          </label>
+        );
+      })}
+    </fieldset>
   );
 }
 
@@ -68,7 +69,7 @@ type DeathVerificationCardProps = {
   onChange: (next: DeathDocumentSelection) => void;
 };
 
-/** Kartu satu dokumen: pemeriksaan [INPUT] dan [GAMBAR] yang independen. */
+/** Satu dokumen dengan dua kelompok radio terpisah: data PLAVON dan lampiran fisik. */
 export default function DeathVerificationCard({
   document: doc,
   selection,
@@ -78,58 +79,37 @@ export default function DeathVerificationCard({
   const badge = badgeConfig[result];
 
   return (
-    <div className="flex flex-col gap-4 rounded-lg bg-white p-5 shadow-sm transition-all hover:shadow-md">
-      <div className="flex items-start justify-between gap-3 pb-3 md:items-center">
-        <div className="flex items-start gap-3 md:items-center">
-          <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded bg-[#0056B3] text-sm font-bold text-white md:mt-0">
-            {doc.id}
-          </div>
-          <div className="flex items-center gap-2">
-            <Icon name={doc.icon} className="shrink-0 text-[22px] text-[#003F87]" />
-            <span className="text-base font-semibold leading-snug text-[#191c1e]">{doc.title}</span>
-          </div>
+    <section className="rounded-lg border border-[#e4e8ed] bg-white p-4 shadow-sm">
+      <div className="mb-3 flex items-center justify-between gap-3 border-b border-[#eceef0] pb-3">
+        <div className="flex min-w-0 items-center gap-2.5">
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-[#e6e8ea] text-[#003F87]">
+            <Icon name={doc.icon} className="text-[19px]" />
+          </span>
+          <h2 className="text-sm font-bold text-[#191c1e]">
+            {doc.id}. {doc.title}
+          </h2>
         </div>
-        <span
-          className={`flex shrink-0 items-center gap-1.5 self-start rounded-full px-3 py-1 text-xs md:self-auto ${badge.badge}`}
-        >
-          <span className={`h-2 w-2 rounded-full ${badge.dot}`} />
+        <span className={`shrink-0 rounded-full px-2.5 py-1 text-[10px] font-semibold ${badge.badge}`}>
           {badge.label}
         </span>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 pt-1 md:grid-cols-2">
-        <div className="flex flex-col gap-2 rounded bg-[#f2f4f6] p-3.5">
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-[#003F87]">
-              [INPUT] DATA TEKS PLAVON
-            </span>
-            <Icon name="keyboard" className="text-[16px] text-[#424752]/70" />
-          </div>
-          <ConditionSelect<DeathInputCondition>
-            id={`death-input-cond-${doc.id}`}
-            label="Kondisi Data Input"
-            value={selection.input}
-            options={deathInputOptions}
-            onChange={(input) => onChange({ ...selection, input })}
-          />
-        </div>
-
-        <div className="flex flex-col gap-2 rounded bg-[#f2f4f6] p-3.5">
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-[#006a6a]">
-              [GAMBAR] LAMPIRAN FISIK
-            </span>
-            <Icon name="photo_library" className="text-[16px] text-[#424752]/70" />
-          </div>
-          <ConditionSelect<DeathImageCondition>
-            id={`death-image-cond-${doc.id}`}
-            label="Kondisi Berkas Fisik / Foto"
-            value={selection.image}
-            options={deathImageOptions}
-            onChange={(image) => onChange({ ...selection, image })}
-          />
-        </div>
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <ConditionRadioGroup<DeathInputCondition>
+          name={`death-input-${doc.id}`}
+          label="Data teks PLAVON"
+          value={selection.input}
+          options={deathInputOptions}
+          onChange={(input) => onChange({ ...selection, input })}
+        />
+        <ConditionRadioGroup<DeathImageCondition>
+          name={`death-image-${doc.id}`}
+          label="Lampiran fisik"
+          value={selection.image}
+          options={deathImageOptions}
+          onChange={(image) => onChange({ ...selection, image })}
+        />
       </div>
-    </div>
+    </section>
   );
 }

@@ -1,5 +1,5 @@
 /**
- * Data Verifikasi Berkas Kematian (KTP-el Modern).
+ * Data Verifikasi Berkas Kematian (KTP-el).
  * Dokumen, urutan, ikon, dan pilihan dropdown disalin dari HTML Stitch kematian.
  */
 

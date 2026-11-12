@@ -20,13 +20,8 @@ type NavItem = {
 const documentationNav: NavItem[] = [
   { label: "Pendaftaran Kependudukan", href: "/dafduk", icon: "badge" },
   { label: "Pencatatan Sipil", href: "/capil", icon: "assignment" },
-];
-
-// Halaman Tools belum dibuat; href "#" sebagai placeholder sampai ada tugas khusus.
-const toolsNav: NavItem[] = [
   { label: "SOP Directory", href: "/sop-directory", icon: "menu_book" },
   { label: "Tentang", href: "/tentang", icon: "info" },
-  { label: "Troubleshooting", href: "#", icon: "build" },
 ];
 
 function NavSection({
@@ -102,8 +97,7 @@ export default function Sidebar({ drawer = false, onNavigate }: SidebarProps) {
           </div>
         </Link>
 
-        <NavSection title="Dokumentasi" items={documentationNav} pathname={pathname} onNavigate={onNavigate} />
-        <NavSection title="Tools" items={toolsNav} pathname={pathname} onNavigate={onNavigate} />
+        <NavSection title="Menu Utama" items={documentationNav} pathname={pathname} onNavigate={onNavigate} />
       </div>
 
       {/* Operator profile */}

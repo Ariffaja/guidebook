@@ -66,14 +66,10 @@ export default function SopCaseList({ cases, tokens, selectedId, onSelect, onRes
                 <span className="flex flex-wrap items-center gap-2">
                   <CategoryBadge category={c.category} />
                   <ClassificationBadge classification={c.classification} />
-                  {c.ref && <span className="text-[11px] font-medium text-[#727784]">{c.ref}</span>}
+                  {c.ref && c.category !== "capil" && (
+                    <span className="text-[11px] font-medium text-[#727784]">{c.ref}</span>
+                  )}
                 </span>
-                {c.template && (
-                  <span className="flex items-center gap-1 rounded bg-[#90efef]/30 px-2 py-0.5 text-[11px] font-medium text-[#006a6a]">
-                    <Icon name="chat_bubble_outline" className="text-[14px]" />
-                    Ada Templat
-                  </span>
-                )}
               </span>
               <span className="block text-sm font-semibold leading-snug text-[#191c1e]">
                 <Highlight text={c.title} tokens={tokens} />

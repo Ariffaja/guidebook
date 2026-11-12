@@ -21,7 +21,7 @@ const verificationAvailable: DeathCategoryKey[] = ["ktp-el-modern"];
 
 /**
  * Tahap 2 Capil: pilih kategori kematian.
- * Hanya KTP-el Modern yang membuka Verifikasi Berkas; kategori lain menampilkan Toast
+ * Hanya kategori KTP-el yang membuka Verifikasi Berkas; kategori lain menampilkan Toast
  * karena desain dan prosedurnya belum tersedia di sumber.
  */
 export default function DeathCategoryStep({ onBack, onOpenVerification }: DeathCategoryStepProps) {

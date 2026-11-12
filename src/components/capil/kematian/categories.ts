@@ -10,7 +10,7 @@ export type DeathCategory = {
   badge: string;
   title: string;
   description: string;
-  /** Menandai kategori utama yang ditonjolkan dengan border biru (KTP-el Modern). */
+  /** Menandai kategori utama yang ditonjolkan dengan border biru (KTP-el). */
   featured?: boolean;
 };
 
@@ -19,7 +19,7 @@ export const deathCategories: DeathCategory[] = [
     key: "ktp-el-modern",
     icon: "contactless",
     badge: "Biometrik",
-    title: "KTP-el Modern",
+    title: "KTP-el",
     description:
       "Pencatatan kematian bagi pemegang KTP elektronik modern terintegrasi IKD dan biometrik digital.",
     featured: true,
