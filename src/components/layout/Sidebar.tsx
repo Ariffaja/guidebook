@@ -4,6 +4,13 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Icon from "@/components/ui/Icon";
 
+type SidebarProps = {
+  /** Mode menu geser (tablet/ponsel): selalu tampil saat dirender oleh MobileNav. */
+  drawer?: boolean;
+  /** Dipanggil saat sebuah tautan diklik, dipakai untuk menutup menu geser. */
+  onNavigate?: () => void;
+};
+
 type NavItem = {
   label: string;
   href: string;
@@ -17,11 +24,22 @@ const documentationNav: NavItem[] = [
 
 // Halaman Tools belum dibuat; href "#" sebagai placeholder sampai ada tugas khusus.
 const toolsNav: NavItem[] = [
-  { label: "SOP Directory", href: "#", icon: "menu_book" },
+  { label: "SOP Directory", href: "/sop-directory", icon: "menu_book" },
+  { label: "Tentang", href: "/tentang", icon: "info" },
   { label: "Troubleshooting", href: "#", icon: "build" },
 ];
 
-function NavSection({ title, items, pathname }: { title: string; items: NavItem[]; pathname: string }) {
+function NavSection({
+  title,
+  items,
+  pathname,
+  onNavigate,
+}: {
+  title: string;
+  items: NavItem[];
+  pathname: string;
+  onNavigate?: () => void;
+}) {
   return (
     <div className="px-6 pt-6">
       <div className="mb-2 px-2 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
@@ -37,15 +55,16 @@ function NavSection({ title, items, pathname }: { title: string; items: NavItem[
               key={item.label}
               href={item.href}
               aria-current={active ? "page" : undefined}
+              onClick={onNavigate}
               className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
                 active
-                  ? "bg-[#0056B3] text-white shadow-sm"
+                  ? "bg-blue-50 text-[#0056B3]"
                   : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
               }`}
             >
               <Icon
                 name={item.icon}
-                className={`text-[20px] ${active ? "text-white" : "text-slate-500"}`}
+                className={`text-[20px] ${active ? "text-[#0056B3]" : "text-slate-500"}`}
               />
               <span>{item.label}</span>
             </Link>
@@ -56,15 +75,20 @@ function NavSection({ title, items, pathname }: { title: string; items: NavItem[
   );
 }
 
-export default function Sidebar() {
+export default function Sidebar({ drawer = false, onNavigate }: SidebarProps) {
   const pathname = usePathname();
 
   return (
-    <aside className="app-sidebar fixed left-0 top-0 z-50 hidden h-full w-72 flex-col justify-between border-r border-slate-200/80 bg-[#f2f4f6] shadow-sm lg:flex">
+    <aside
+      className={`fixed left-0 top-0 z-50 h-full w-72 flex-col justify-between border-r border-slate-200/80 bg-white shadow-sm ${
+        drawer ? "flex" : "hidden lg:flex"
+      }`}
+    >
       <div className="flex flex-1 flex-col overflow-y-auto">
         {/* Brand */}
         <Link
           href="/"
+          onClick={onNavigate}
           className="flex h-16 items-center gap-3 border-b border-slate-100 px-6"
         >
           <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-[#003F87] text-white shadow-sm">
@@ -78,8 +102,8 @@ export default function Sidebar() {
           </div>
         </Link>
 
-        <NavSection title="Documentation" items={documentationNav} pathname={pathname} />
-        <NavSection title="Tools" items={toolsNav} pathname={pathname} />
+        <NavSection title="Dokumentasi" items={documentationNav} pathname={pathname} onNavigate={onNavigate} />
+        <NavSection title="Tools" items={toolsNav} pathname={pathname} onNavigate={onNavigate} />
       </div>
 
       {/* Operator profile */}
