@@ -1,3 +1,5 @@
+import { auth } from "../../auth";
+import { redirect } from "next/navigation";
 import AppLayout from "@/components/layout/AppLayout";
 import ServiceCard from "@/components/home/ServiceCard";
 
@@ -32,7 +34,13 @@ const services = [
   },
 ] as const;
 
-export default function HomePage() {
+export default async function HomePage() {
+  const session = await auth();
+
+  if (!session?.user) {
+    redirect("/login");
+  }
+
   return (
     <AppLayout pageLabel="Beranda Panduan">
       <div className="mx-auto mb-10 max-w-2xl pt-4 text-center sm:mb-12">

@@ -1,21 +1,31 @@
 
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Icon from "@/components/ui/Icon";
+import LogoutButton from "@/components/auth/LogoutButton";
 import MobileNav from "./MobileNav";
 
 type HeaderProps = {
   pageLabel: string;
+  user: {
+    name: string | null;
+    email: string | null;
+    role: string;
+  } | null;
 };
 
-export default function Header({ pageLabel }: HeaderProps) {
+export default function Header({ pageLabel, user }: HeaderProps) {
   const [darkMode, setDarkMode] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
+  const profileMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const savedTheme = window.localStorage.getItem("guidebook-theme");
     const isDark = savedTheme === "dark";
 
+    // Apply the stored preference after hydration to avoid a server/client mismatch.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setDarkMode(isDark);
     document.documentElement.classList.toggle("dark", isDark);
   }, []);
@@ -33,6 +43,39 @@ export default function Header({ pageLabel }: HeaderProps) {
       return nextDarkMode;
     });
   }
+
+  useEffect(() => {
+    if (!profileOpen) return;
+
+    function handlePointerDown(event: PointerEvent) {
+      if (
+        event.target instanceof Node &&
+        profileMenuRef.current &&
+        !profileMenuRef.current.contains(event.target)
+      ) {
+        setProfileOpen(false);
+      }
+    }
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") setProfileOpen(false);
+    }
+
+    document.addEventListener("pointerdown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [profileOpen]);
+
+  const displayName = user?.name?.trim() || "Pengguna";
+  const initials = displayName
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((part) => part.charAt(0))
+    .join("")
+    .toUpperCase();
 
   return (
     <header className="app-header fixed left-0 right-0 top-0 z-40 flex h-16 items-center justify-between border-b border-slate-200/80 bg-white/90 px-4 shadow-sm backdrop-blur-md sm:px-8 lg:left-72">
@@ -78,9 +121,50 @@ export default function Header({ pageLabel }: HeaderProps) {
           <Icon name="settings" className="text-[20px]" />
         </button>
 
-        <div className="ml-1 flex h-8 w-8 items-center justify-center rounded-full bg-[#003F87] text-white shadow-sm">
-          <Icon name="person" className="text-[18px]" />
-        </div>
+        {user && (
+          <div ref={profileMenuRef} className="relative ml-1">
+            <button
+              type="button"
+              aria-label={`Buka profil ${displayName}`}
+              aria-expanded={profileOpen}
+              aria-controls="profile-menu"
+              onClick={() => setProfileOpen((open) => !open)}
+              className="flex h-9 w-9 items-center justify-center rounded-full bg-[#003F87] text-xs font-semibold text-white shadow-sm transition-colors hover:bg-[#0056B3] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0056B3]"
+            >
+              {initials}
+            </button>
+
+            {profileOpen && (
+              <div
+                id="profile-menu"
+                className="absolute right-0 top-full z-50 mt-2 w-72 max-w-[calc(100vw-2rem)] rounded-xl border border-slate-200 bg-white p-4 shadow-lg"
+              >
+                <p className="mb-3 text-sm font-semibold text-slate-900">
+                  Profil pengguna
+                </p>
+                <dl className="space-y-3 text-sm">
+                  <div>
+                    <dt className="text-xs text-slate-500">Nama</dt>
+                    <dd className="truncate font-medium text-slate-800">
+                      {displayName}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-xs text-slate-500">Email</dt>
+                    <dd className="break-all font-medium text-slate-800">
+                      {user.email || "-"}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-xs text-slate-500">Role</dt>
+                    <dd className="font-medium text-slate-800">{user.role}</dd>
+                  </div>
+                </dl>
+                <LogoutButton />
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </header>
   );
