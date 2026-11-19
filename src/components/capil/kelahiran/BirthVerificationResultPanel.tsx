@@ -1,5 +1,5 @@
 import Icon from "@/components/ui/Icon";
-import type { VerificationDocument } from "./birthVerificationData";
+import type { DocumentSelection, VerificationDocument } from "./birthVerificationData";
 import {
   TOTAL_DOCUMENTS,
   buildDirective,
@@ -8,20 +8,29 @@ import {
   type OverallStatus,
 } from "./birthVerificationLogic";
 
-const statusConfig: Record<
-  OverallStatus,
-  { box: string; icon: string; iconClass: string; headline: string; headlineClass: string; desc: string }
-> = {
+type StatusConfig = {
+  box: string;
+  frame: string;
+  icon: string;
+  iconClass: string;
+  headline: string;
+  headlineClass: string;
+  desc: string;
+};
+
+const statusConfig: Record<OverallStatus, StatusConfig> = {
   menunggu: {
-    box: "bg-[#f2f4f6]",
-    icon: "more_horiz",
-    iconClass: "text-[#727784]",
+    box: "bg-[#e6e8ea] text-[#424752]",
+    frame: "border-[#dfe3e8] bg-[#f5f6f7] text-[#59616d]",
+    icon: "info",
+    iconClass: "text-[#59616d]",
     headline: "Menunggu Kelengkapan Berkas",
     headlineClass: "font-semibold text-[#191c1e]",
-    desc: "",
+    desc: "Pilih kondisi data dan lampiran untuk melihat hasil pemeriksaan berkas.",
   },
   siap: {
-    box: "bg-[#90efef] text-[#006e6e]",
+    box: "bg-[#86e8e2] text-[#004f4f]",
+    frame: "border-[#b7e9e5] bg-[#e8faf8] text-[#075c58]",
     icon: "check_circle",
     iconClass: "text-[#006a6a]",
     headline: "SIAP DIVERIFIKASI (VALID)",
@@ -29,15 +38,17 @@ const statusConfig: Record<
     desc: "Seluruh enam dokumen telah memenuhi kriteria pemeriksaan awal dan dapat ditindaklanjuti operator sesuai prosedur yang berlaku.",
   },
   btl: {
-    box: "bg-[#ffdbcc] text-[#351000]",
+    box: "bg-[#ffdbcc] text-[#7b2f00]",
+    frame: "border-[#f2c2a8] bg-[#fff5ef] text-[#833b13]",
     icon: "pending_actions",
-    iconClass: "text-[#722b00]",
+    iconClass: "text-[#9a3f0b]",
     headline: "BERKAS TIDAK LENGKAP (BTL)",
     headlineClass: "font-bold text-[#722b00]",
     desc: "Beberapa dokumen memerlukan perbaikan foto atau penyesuaian penulisan teks sebelum dapat dimasukkan ke SIAK.",
   },
   tdp: {
     box: "bg-[#ffdad6] text-[#93000a]",
+    frame: "border-[#f2b8b5] bg-[#fff1f0] text-[#93000a]",
     icon: "cancel",
     iconClass: "text-[#ba1a1a]",
     headline: "TIDAK DAPAT DIPROSES (TDP)",
@@ -46,160 +57,102 @@ const statusConfig: Record<
   },
 };
 
-const categories: { status: Exclude<OverallStatus, "menunggu">; icon: string; iconClass: string; label: string; activeBg: string }[] = [
-  { status: "siap", icon: "check_circle", iconClass: "text-[#006a6a]", label: "Siap Diverifikasi", activeBg: "bg-[#90efef]" },
-  { status: "btl", icon: "pending_actions", iconClass: "text-[#722b00]", label: "BTL (Perbaikan)", activeBg: "bg-[#ffdbcc]" },
-  { status: "tdp", icon: "cancel", iconClass: "text-[#ba1a1a]", label: "TDP (Tolak)", activeBg: "bg-[#ffdad6]" },
-];
-
-const checklistConfig: Record<
-  DocumentResult,
-  { icon: string; iconClass: string; label: string; labelClass: string; item: string }
-> = {
-  pending: { icon: "radio_button_unchecked", iconClass: "text-[#727784]", label: "Menunggu", labelClass: "text-[#424752]", item: "bg-[#f2f4f6]" },
-  valid: { icon: "check_circle", iconClass: "text-[#006a6a]", label: "Sesuai", labelClass: "font-bold text-[#006a6a]", item: "bg-[#eceef0]" },
-  tolak: { icon: "cancel", iconClass: "text-[#ba1a1a]", label: "Tolak", labelClass: "font-bold text-[#ba1a1a]", item: "bg-[#e6e8ea]" },
-  perbaikan: { icon: "pending", iconClass: "text-[#722b00]", label: "Perbaikan (BTL)", labelClass: "font-bold text-[#722b00]", item: "bg-[#e6e8ea]" },
+const checklistConfig: Record<DocumentResult, { iconClass: string; label: string; labelClass: string }> = {
+  pending: { iconClass: "text-[#727784]", label: "Belum dipilih", labelClass: "bg-[#e6e8ea] text-[#59616d]" },
+  valid: { iconClass: "text-[#006a6a]", label: "✓ Sesuai", labelClass: "bg-[#90efef] text-[#006a6a]" },
+  tolak: { iconClass: "text-[#ba1a1a]", label: "Tidak memenuhi (TDP)", labelClass: "bg-[#ffdad6] text-[#93000a]" },
+  perbaikan: { iconClass: "text-[#722b00]", label: "Perlu perbaikan (BTL)", labelClass: "bg-[#ffdbcc] text-[#722b00]" },
 };
 
-const sectionLabel = "text-[11px] font-bold uppercase tracking-wider text-[#424752]";
+const sectionLabel = "text-[9px] font-bold uppercase tracking-[1.3px] text-[#657181]";
 
 type BirthVerificationResultPanelProps = {
   documents: VerificationDocument[];
+  selections: DocumentSelection[];
   evaluation: Evaluation;
   onCopy: (text: string) => void;
 };
 
-/** Panel kanan: status sistem, kategori, template arahan, checklist, dan petunjuk operator. */
+/** Ringkasan status, lampiran, dan template arahan operator. */
 export default function BirthVerificationResultPanel({
   documents,
+  selections,
   evaluation,
   onCopy,
 }: BirthVerificationResultPanelProps) {
   const config = statusConfig[evaluation.status];
+  const directive = buildDirective(evaluation);
   const remaining = TOTAL_DOCUMENTS - evaluation.completedCount;
   const description =
-    evaluation.status === "menunggu"
-      ? evaluation.completedCount === 0
-        ? "Lengkapi kondisi pemeriksaan dokumen untuk melihat hasil."
-        : `Lengkapi ${remaining} berkas tersisa untuk menentukan status validasi akhir.`
+    evaluation.status === "menunggu" && evaluation.completedCount > 0
+      ? `Lengkapi ${remaining} berkas tersisa untuk menentukan status validasi akhir.`
       : config.desc;
-  const directive = buildDirective(evaluation);
 
   return (
-    <div className="flex flex-col gap-5 xl:sticky xl:top-20">
-      <div className="flex flex-col gap-5 rounded-lg bg-white p-6 shadow-sm">
-        <div className="flex flex-col gap-1 pb-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              <Icon name="verified" className="text-[24px] text-[#003F87]" />
-              <h2 className="text-2xl font-semibold text-[#191c1e]">Hasil Pemeriksaan</h2>
-            </div>
-            <span className="rounded bg-[#eceef0] px-2 py-0.5 font-mono text-[11px] text-[#424752]">
-              AUTO-DETECTION
-            </span>
-          </div>
-          <span className="text-[13px] text-[#424752]">
-            Deteksi sistem otomatis sesuai kombinasi berkas. Sistem mendeteksi status berdasarkan kombinasi
-            kondisi input dan gambar pada keenam berkas.
+    <section className="rounded-xl border border-[#e4e8ed] bg-white p-4 shadow-sm sm:p-5" aria-live="polite">
+      <div className="mb-3 flex items-center justify-between gap-3">
+        <div>
+          <p className="mb-2 text-[9px] font-bold uppercase tracking-[1.5px] text-[#657181]">
+            Status Verifikasi SIAK
+          </p>
+          <span className={`inline-flex rounded-md px-2.5 py-1 text-[10px] font-bold ${config.box}`}>
+            {config.headline}
           </span>
         </div>
+        <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${config.box}`}>
+          <Icon name={config.icon} className={`text-[23px] ${config.iconClass}`} />
+        </span>
+      </div>
+      <div className={`rounded-lg border p-3 text-[11px] leading-relaxed ${config.frame}`}>
+        {description}
+      </div>
 
+      <div className="mt-5">
+        <h3 className={`mb-2 ${sectionLabel}`}>Pemeriksaan Lampiran</h3>
         <div className="flex flex-col gap-2">
-          <span className={sectionLabel}>STATUS SISTEM TERDETEKSI</span>
-          <div
-            role="status"
-            aria-live="polite"
-            className={`flex items-start gap-3 rounded-lg p-4 transition-all duration-300 ${config.box}`}
+          {documents.map((doc, index) => {
+            const result = evaluation.results[index];
+            const item = checklistConfig[result];
+            const selection = selections[index];
+            const value =
+              result === "pending" && (selection.input !== "" || selection.image !== "")
+                ? "Belum lengkap"
+                : item.label;
+            return (
+              <div
+                key={doc.id}
+                className="flex items-center justify-between gap-2 rounded-md bg-[#f5f6f7] px-2.5 py-2"
+              >
+                <span className="flex min-w-0 items-center gap-2">
+                  <Icon name={doc.icon} className={`shrink-0 text-[15px] ${item.iconClass}`} />
+                  <span className="truncate text-[11px] text-[#191c1e]">{doc.checklistLabel}</span>
+                </span>
+                <span className={`shrink-0 rounded px-1.5 py-1 text-[9px] font-semibold ${item.labelClass}`}>
+                  {value}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="mt-5 border-t border-[#e4e8ed] pt-4">
+        <div className="mb-2 flex items-center justify-between gap-3">
+          <h3 className={sectionLabel}>Template Arahan Pesan Operator (PLAVON)</h3>
+          <button
+            type="button"
+            onClick={() => onCopy(directive)}
+            className="inline-flex shrink-0 items-center gap-1 text-[10px] font-medium text-[#0056B3] transition-colors hover:text-[#003F87] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0056B3]"
           >
-            <Icon name={config.icon} className={`mt-0.5 text-[24px] ${config.iconClass}`} />
-            <div className="flex flex-col gap-0.5">
-              <span className={`text-[15px] ${config.headlineClass}`}>{config.headline}</span>
-              <span className="text-[13px] text-[#424752]">{description}</span>
-            </div>
-          </div>
+            <Icon name="content_copy" className="text-[13px]" /> Salin Pesan
+          </button>
         </div>
-
-        <div className="flex flex-col gap-2">
-          <span className={sectionLabel}>Kategori Status SIAK</span>
-          <div className="grid grid-cols-3 gap-2">
-            {categories.map((category) => {
-              const active = evaluation.status === category.status;
-              return (
-                <div
-                  key={category.status}
-                  className={`rounded p-2.5 text-center transition-all ${
-                    active ? `${category.activeBg} font-bold` : "bg-[#eceef0] opacity-40"
-                  }`}
-                >
-                  <Icon
-                    name={category.icon}
-                    className={`mx-auto mb-1 block text-[18px] ${category.iconClass}`}
-                  />
-                  <span className="block text-[11px] font-semibold leading-tight text-[#191c1e]">
-                    {category.label}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        <div className="flex flex-col gap-2">
-          <div className="flex items-center justify-between">
-            <span className={sectionLabel}>Template Arahan Pesan Operator</span>
-            <button
-              type="button"
-              onClick={() => onCopy(directive)}
-              className="flex items-center gap-1 text-[11px] font-semibold text-[#003F87] hover:text-[#0056B3] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0056B3]"
-            >
-              <Icon name="content_copy" className="text-[14px]" /> Salin
-            </button>
-          </div>
-          <div className="min-h-[96px] select-all whitespace-pre-wrap rounded bg-[#f2f4f6] p-3.5 font-mono text-xs leading-relaxed text-[#424752]">
-            {directive}
-          </div>
-        </div>
-
-        <div className="flex flex-col gap-2 pt-2">
-          <div className="mb-1 flex items-center justify-between">
-            <span className={sectionLabel}>Checklist Verifikasi 6 Dokumen</span>
-            <span className="font-mono text-[11px] font-bold text-[#003F87]">
-              {evaluation.completedCount} / {TOTAL_DOCUMENTS} DIPERIKSA
-            </span>
-          </div>
-          <ul className="flex flex-col gap-2">
-            {documents.map((doc, index) => {
-              const item = checklistConfig[evaluation.results[index]];
-              return (
-                <li
-                  key={doc.id}
-                  className={`flex items-center justify-between rounded p-2 transition-colors ${item.item}`}
-                >
-                  <div className="flex items-center gap-2.5">
-                    <Icon name={item.icon} className={`text-[18px] ${item.iconClass}`} />
-                    <span className="text-[13px] text-[#191c1e]">
-                      {doc.id}. {doc.checklistLabel}
-                    </span>
-                  </div>
-                  <span className={`text-[11px] font-semibold ${item.labelClass}`}>{item.label}</span>
-                </li>
-              );
-            })}
-          </ul>
+        <div className="max-h-64 overflow-y-auto whitespace-pre-wrap rounded-lg border border-[#e7eaee] bg-[#f8f9fa] p-3 text-[10px] leading-relaxed text-[#424752]">
+          {directive}
         </div>
       </div>
 
-      <div className="flex items-start gap-3 rounded-lg bg-[#f2f4f6] p-4">
-        <Icon name="help_center" className="mt-0.5 shrink-0 text-[20px] text-[#003F87]" />
-        <div className="flex flex-col gap-0.5">
-          <span className="text-xs font-semibold text-[#191c1e]">Petunjuk Operasional NIK Bayi Kecil</span>
-          <span className="text-xs leading-relaxed text-[#424752]">
-            Data NIK baru akan dibuat otomatis oleh subsistem SIAK Terpusat setelah Surat Keterangan
-            Kelahiran dan status pernikahan orang tua terverifikasi sah.
-          </span>
-        </div>
-      </div>
-    </div>
+
+    </section>
   );
 }

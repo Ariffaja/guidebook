@@ -72,6 +72,8 @@ export default function DeathVerificationResultPanel({
   return (
     <aside className="xl:sticky xl:top-20">
       <section className="flex flex-col gap-4 rounded-xl border border-[#e4e8ed] bg-white p-4 shadow-sm">
+        {evaluation.status !== "menunggu" && (
+          <> 
         <div className="flex items-center justify-between gap-2">
           <span className={sectionLabel}>Status Verifikasi</span>
           <span className={`inline-flex items-center gap-1 rounded-md px-2.5 py-1 text-[10px] font-bold ${config.badge}`}>
@@ -83,7 +85,10 @@ export default function DeathVerificationResultPanel({
         <div role="status" aria-live="polite" className={`rounded-lg p-3 text-[12px] leading-relaxed text-[#424752] ${config.box}`}>
           {config.description}
         </div>
+          </>
+        )}
 
+        {evaluation.completedCount > 0 && (
         <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between gap-2">
             <span className={sectionLabel}>Pemeriksaan Lampiran</span>
@@ -119,6 +124,7 @@ export default function DeathVerificationResultPanel({
             })}
           </ul>
         </div>
+        )}
 
         <div className="border-t border-[#e4e8ed] pt-3">
           <div className="mb-2 flex items-center justify-between gap-2">
