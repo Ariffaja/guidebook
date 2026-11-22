@@ -9,6 +9,7 @@ type SidebarProps = {
   drawer?: boolean;
   /** Dipanggil saat sebuah tautan diklik, dipakai untuk menutup menu geser. */
   onNavigate?: () => void;
+  isAdmin?: boolean;
 };
 
 type NavItem = {
@@ -69,7 +70,7 @@ function NavSection({
   );
 }
 
-export default function Sidebar({ drawer = false, onNavigate }: SidebarProps) {
+export default function Sidebar({ drawer = false, onNavigate, isAdmin = false }: SidebarProps) {
   const pathname = usePathname();
 
   return (
@@ -100,6 +101,8 @@ export default function Sidebar({ drawer = false, onNavigate }: SidebarProps) {
           title="Menu Utama"
           items={[
             ...documentationNav,
+            ...(isAdmin ? [{ label: "SOP Management", href: "/sop-management", icon: "settings" }] : []),
+            ...(isAdmin ? [{ label: "Manajemen Akun", href: "/account-management", icon: "manage_accounts" }] : []),
             { label: "Tentang", href: "/tentang", icon: "info" },
           ]}
           pathname={pathname}
