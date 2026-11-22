@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 export default async function EditSopCasePage({ params }: { params: Promise<{ id: string }> }) {
   const session = await auth();
-  if (!session?.user) redirect("/login");
+  if (!session?.user || !session.user.isActive) redirect("/login");
   if (session.user.role !== "ADMIN") redirect("/");
 
   const { id } = await params;

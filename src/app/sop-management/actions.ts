@@ -17,7 +17,7 @@ const allowedTypes = {
 
 async function requireAdmin() {
   const session = await auth();
-  if (!session?.user) redirect("/login");
+  if (!session?.user || !session.user.isActive) redirect("/login");
   if (session.user.role !== "ADMIN") redirect("/");
 }
 

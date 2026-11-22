@@ -4,6 +4,7 @@
 import { useEffect, useRef, useState } from "react";
 import Icon from "@/components/ui/Icon";
 import LogoutButton from "@/components/auth/LogoutButton";
+import ChangeOwnPasswordForm from "@/components/accounts/ChangeOwnPasswordForm";
 import MobileNav from "./MobileNav";
 
 type HeaderProps = {
@@ -18,6 +19,7 @@ type HeaderProps = {
 export default function Header({ pageLabel, user }: HeaderProps) {
   const [darkMode, setDarkMode] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [passwordFormOpen, setPasswordFormOpen] = useState(false);
   const profileMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -80,7 +82,7 @@ export default function Header({ pageLabel, user }: HeaderProps) {
   return (
     <header className="app-header fixed left-0 right-0 top-0 z-40 flex h-16 items-center justify-between border-b border-slate-200/80 bg-white/90 px-4 shadow-sm backdrop-blur-md sm:px-8 lg:left-[19rem]">
       <div className="flex min-w-0 items-center gap-3">
-        <MobileNav />
+        <MobileNav isAdmin={user?.role === "ADMIN"} />
 
         <span className="truncate text-base font-semibold text-slate-800 sm:text-lg">
           Guidebook: PLAVON ke SIAK
@@ -160,6 +162,10 @@ export default function Header({ pageLabel, user }: HeaderProps) {
                     <dd className="font-medium text-slate-800">{user.role}</dd>
                   </div>
                 </dl>
+                <button type="button" onClick={() => setPasswordFormOpen((open) => !open)} className="mt-3 w-full rounded-lg border border-slate-200 px-3 py-2 text-left text-sm font-medium text-[#0056B3] hover:bg-blue-50">
+                  {passwordFormOpen ? "Tutup ubah sandi" : "Ubah sandi"}
+                </button>
+                {passwordFormOpen && <ChangeOwnPasswordForm />}
                 <LogoutButton />
               </div>
             )}
