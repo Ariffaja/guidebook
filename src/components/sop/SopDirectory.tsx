@@ -6,7 +6,6 @@ import Toast from "@/components/ui/Toast";
 import SopCaseDetail from "./SopCaseDetail";
 import SopCaseList from "./SopCaseList";
 import SopFilterBar from "./SopFilterBar";
-import { sopCases } from "./sopCases";
 import {
   countByCategory,
   countClassifications,
@@ -16,16 +15,14 @@ import {
   type ClassificationFilter,
 } from "./sopFilter";
 import { sopCategories, type SopCase } from "./sopTypes";
+import { renderSopTemplate } from "./sopDeadline";
 
 type ToastState = { id: number; icon: string; message: ReactNode };
-
-/** Jumlah per kategori dihitung dari data yang benar-benar dimuat. */
-const categoryCounts = countByCategory(sopCases);
 
 /** Lebar layar (px) mulai dari mana daftar dan detail tampil berdampingan (breakpoint xl). */
 const SPLIT_LAYOUT_MIN_WIDTH = 1280;
 
-export default function SopDirectory() {
+export default function SopDirectory({ cases, holidays, completeYears }: { cases: SopCase[]; holidays: string[]; completeYears: number[] }) {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<CategoryFilter>("all");
   const [classification, setClassification] = useState<ClassificationFilter>("all");
@@ -37,13 +34,14 @@ export default function SopDirectory() {
   const copyTimer = useRef<number | null>(null);
 
   const tokens = useMemo(() => tokenize(query), [query]);
+  const categoryCounts = useMemo(() => countByCategory(cases), [cases]);
   const filtered = useMemo(
-    () => filterCases(sopCases, { query, category, classification }),
-    [query, category, classification],
+    () => filterCases(cases, { query, category, classification }),
+    [cases, query, category, classification],
   );
   const classificationCounts = useMemo(
-    () => countClassifications(sopCases, { query, category }),
-    [query, category],
+    () => countClassifications(cases, { query, category }),
+    [cases, query, category],
   );
   // Detail hanya tampil bila kasus terpilih masih termasuk hasil filter.
   const selectedCase = filtered.find((c) => c.id === selectedId) ?? null;
@@ -64,9 +62,10 @@ export default function SopDirectory() {
   }
 
   async function handleCopy(sopCase: SopCase) {
-    if (!sopCase.template) return;
+    const template = renderSopTemplate(sopCase.template, sopCase.deadlineBusinessDays, holidays, completeYears);
+    if (!template) return;
     try {
-      await navigator.clipboard.writeText(sopCase.template);
+      await navigator.clipboard.writeText(template);
       setCopiedId(sopCase.id);
       if (copyTimer.current !== null) window.clearTimeout(copyTimer.current);
       copyTimer.current = window.setTimeout(() => {
@@ -165,7 +164,7 @@ export default function SopDirectory() {
         onChange={setClassification}
         counts={classificationCounts}
         shown={filtered.length}
-        total={sopCases.length}
+        total={cases.length}
       />
 
       <div className="grid grid-cols-1 items-start gap-6 xl:grid-cols-12">
@@ -183,6 +182,8 @@ export default function SopDirectory() {
             sopCase={selectedCase}
             onCopy={handleCopy}
             copied={selectedCase?.id === copiedId}
+            holidays={holidays}
+            completeYears={completeYears}
           />
         </div>
       </div>

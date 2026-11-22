@@ -1,17 +1,28 @@
 export type SopCategory = "dafduk" | "capil";
 
 export type SopClassification = "BTL" | "TDP";
+export type SopCaseType = "pindah-datang" | "pindah-keluar" | "kematian" | "kelahiran";
+
+export const sopCaseTypeLabels: Record<SopCaseType, string> = {
+  "pindah-datang": "Pindah Datang",
+  "pindah-keluar": "Pindah Keluar",
+  kematian: "Kematian",
+  kelahiran: "Kelahiran",
+};
 
 /** Satu catatan kasus beserta templat responsnya. */
 export type SopCase = {
   /** Pengenal stabil untuk React key dan seleksi (bukan nomor SOP resmi). */
   id: string;
   category: SopCategory;
+  /** Jenis kasus yang diwajibkan untuk entri baru; catatan lama belum tentu punya nilai ini. */
+  caseType?: SopCaseType | null;
   /** Nomor catatan pada dokumen sumber, jika ada (contoh: "Kasus 1.1"). */
   ref?: string;
   title: string;
   /** Hanya diisi jika klasifikasi tertulis di sumber. Jangan menebak. */
   classification?: SopClassification;
+  deadlineBusinessDays?: number | null;
   /** Deskripsi / kondisi pemicu, hanya jika tersedia di sumber. */
   description?: string;
   /** Templat respons asli, disalin apa adanya. */

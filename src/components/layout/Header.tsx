@@ -8,6 +8,7 @@ import MobileNav from "./MobileNav";
 
 type HeaderProps = {
   pageLabel: string;
+  isAdmin?: boolean;
   user: {
     name: string | null;
     email: string | null;
@@ -15,7 +16,7 @@ type HeaderProps = {
   } | null;
 };
 
-export default function Header({ pageLabel, user }: HeaderProps) {
+export default function Header({ pageLabel, user, isAdmin = false }: HeaderProps) {
   const [darkMode, setDarkMode] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const profileMenuRef = useRef<HTMLDivElement>(null);
@@ -80,7 +81,7 @@ export default function Header({ pageLabel, user }: HeaderProps) {
   return (
     <header className="app-header fixed left-0 right-0 top-0 z-40 flex h-16 items-center justify-between border-b border-slate-200/80 bg-white/90 px-4 shadow-sm backdrop-blur-md sm:px-8 lg:left-72">
       <div className="flex min-w-0 items-center gap-3">
-        <MobileNav />
+        <MobileNav isAdmin={isAdmin} />
 
         <span className="truncate text-base font-semibold text-slate-800 sm:text-lg">
           Guidebook: PLAVON ke SIAK

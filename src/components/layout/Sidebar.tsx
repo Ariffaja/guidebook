@@ -9,6 +9,7 @@ type SidebarProps = {
   drawer?: boolean;
   /** Dipanggil saat sebuah tautan diklik, dipakai untuk menutup menu geser. */
   onNavigate?: () => void;
+  isAdmin?: boolean;
 };
 
 type NavItem = {
@@ -21,7 +22,6 @@ const documentationNav: NavItem[] = [
   { label: "Pendaftaran Kependudukan", href: "/dafduk", icon: "badge" },
   { label: "Pencatatan Sipil", href: "/capil", icon: "assignment" },
   { label: "SOP Directory", href: "/sop-directory", icon: "menu_book" },
-  { label: "Tentang", href: "/tentang", icon: "info" },
 ];
 
 function NavSection({
@@ -70,7 +70,7 @@ function NavSection({
   );
 }
 
-export default function Sidebar({ drawer = false, onNavigate }: SidebarProps) {
+export default function Sidebar({ drawer = false, onNavigate, isAdmin = false }: SidebarProps) {
   const pathname = usePathname();
 
   return (
@@ -97,7 +97,16 @@ export default function Sidebar({ drawer = false, onNavigate }: SidebarProps) {
           </div>
         </Link>
 
-        <NavSection title="Menu Utama" items={documentationNav} pathname={pathname} onNavigate={onNavigate} />
+        <NavSection
+          title="Menu Utama"
+          items={[
+            ...documentationNav,
+            ...(isAdmin ? [{ label: "SOP Management", href: "/sop-management", icon: "settings" }] : []),
+            { label: "Tentang", href: "/tentang", icon: "info" },
+          ]}
+          pathname={pathname}
+          onNavigate={onNavigate}
+        />
       </div>
 
       {/* Operator profile */}

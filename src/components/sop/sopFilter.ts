@@ -1,5 +1,5 @@
 import type { SopCase, SopCategory, SopClassification } from "./sopTypes";
-import { sopClassifications } from "./sopTypes";
+import { sopClassifications, sopCaseTypeLabels } from "./sopTypes";
 
 /**
  * Fungsi murni untuk pencarian dan filter SOP Directory (tanpa React/DOM).
@@ -25,7 +25,8 @@ export function tokenize(query: string): string[] {
 }
 
 function headText(c: SopCase): string {
-  return normalize([c.title, c.ref ?? "", c.description ?? "", ...(c.keywords ?? [])].join(" "));
+  const caseType = c.caseType ? sopCaseTypeLabels[c.caseType] : "";
+  return normalize([c.title, caseType, c.ref ?? "", c.description ?? "", ...(c.keywords ?? [])].join(" "));
 }
 
 function fullText(c: SopCase): string {

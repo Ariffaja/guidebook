@@ -23,10 +23,11 @@ export default async function AppLayout({ children, pageLabel }: AppLayoutProps)
 
   return (
     <div className="app-shell min-h-screen bg-[#F7F9FB] text-slate-800">
-      <Sidebar />
+      <Sidebar isAdmin={session.user.role === "ADMIN"} />
       <div className="flex min-h-screen flex-col lg:pl-72">
         <Header
           pageLabel={pageLabel}
+          isAdmin={session.user.role === "ADMIN"}
           user={
             session?.user
               ? {

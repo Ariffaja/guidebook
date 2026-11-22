@@ -4,16 +4,15 @@
 // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
-
 generator client {
   provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
 }
 
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
-
 
 model Role {
   id          Int      @id @default(autoincrement())
@@ -34,4 +33,48 @@ model User {
   role      Role     @relation(fields: [roleId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model SopCase {
+  id                   String   @id @db.VarChar(64)
+  sortOrder            Int      @default(0)
+  category             String   @db.VarChar(16)
+  caseType             String?  @db.VarChar(32)
+  ref                  String?  @db.VarChar(64)
+  title                String   @db.VarChar(255)
+  classification       String?  @db.VarChar(8)
+  deadlineBusinessDays Int?
+  description          String?  @db.Text
+  template             String?  @db.LongText
+  keywords             Json?
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  @@index([category])
+  @@index([classification])
+}
+
+model SopDataMigration {
+  key         String   @id @db.VarChar(100)
+  completedAt DateTime @default(now())
+}
+
+model HolidayCalendar {
+  year       Int               @id
+  source     String            @db.VarChar(255)
+  isComplete Boolean           @default(false)
+  holidays   NationalHoliday[]
+  createdAt  DateTime          @default(now())
+  updatedAt  DateTime          @updatedAt
+}
+
+model NationalHoliday {
+  id        Int             @id @default(autoincrement())
+  date      DateTime        @unique @db.Date
+  name      String          @db.VarChar(255)
+  year      Int
+  calendar  HolidayCalendar @relation(fields: [year], references: [year], onDelete: Cascade)
+  createdAt DateTime        @default(now())
+
+  @@index([year])
 }

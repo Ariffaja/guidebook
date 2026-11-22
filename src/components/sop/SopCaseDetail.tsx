@@ -1,6 +1,7 @@
 import Icon from "@/components/ui/Icon";
-import { ClassificationBadge, CategoryBadge } from "./SopBadges";
+import { CaseTypeBadge, ClassificationBadge, CategoryBadge } from "./SopBadges";
 import type { SopCase } from "./sopTypes";
+import { renderSopTemplate } from "./sopDeadline";
 
 const sectionLabel =
   "mb-2 flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-[#424752]";
@@ -9,10 +10,12 @@ type SopCaseDetailProps = {
   sopCase: SopCase | null;
   onCopy: (sopCase: SopCase) => void;
   copied: boolean;
+  holidays: string[];
+  completeYears: number[];
 };
 
 /** Panel detail: judul, deskripsi (jika ada), templat asli, dan tombol salin pesan. */
-export default function SopCaseDetail({ sopCase, onCopy, copied }: SopCaseDetailProps) {
+export default function SopCaseDetail({ sopCase, onCopy, copied, holidays, completeYears }: SopCaseDetailProps) {
   if (!sopCase) {
     return (
       <div className="flex flex-col items-center gap-3 rounded-lg bg-white p-10 text-center shadow-sm">
@@ -24,10 +27,13 @@ export default function SopCaseDetail({ sopCase, onCopy, copied }: SopCaseDetail
     );
   }
 
+  const renderedTemplate = renderSopTemplate(sopCase.template, sopCase.deadlineBusinessDays, holidays, completeYears);
+
   return (
     <article className="flex flex-col rounded-lg bg-white p-6 shadow-md">
       <div className="flex flex-wrap items-center gap-2 border-b border-[#eceef0] pb-4">
         <CategoryBadge category={sopCase.category} />
+        <CaseTypeBadge caseType={sopCase.caseType} />
         <ClassificationBadge classification={sopCase.classification} />
         {sopCase.ref && sopCase.category !== "capil" && (
           <span className="text-xs font-medium text-[#727784]">{sopCase.ref}</span>
@@ -56,7 +62,7 @@ export default function SopCaseDetail({ sopCase, onCopy, copied }: SopCaseDetail
           </h3>
           <button
             type="button"
-            disabled={!sopCase.template}
+            disabled={!renderedTemplate}
             onClick={() => onCopy(sopCase)}
             className="inline-flex shrink-0 items-center gap-1 text-[10px] font-medium text-[#0056B3] transition-colors hover:text-[#003F87] disabled:cursor-not-allowed disabled:text-[#9aa3ad]"
           >
@@ -64,9 +70,9 @@ export default function SopCaseDetail({ sopCase, onCopy, copied }: SopCaseDetail
             {copied ? "Tersalin" : "Salin Pesan"}
           </button>
         </div>
-        {sopCase.template ? (
+        {renderedTemplate ? (
           <div className="select-all whitespace-pre-wrap rounded bg-[#f2f4f6] p-4 text-[13px] leading-relaxed text-[#191c1e]">
-            {sopCase.template}
+            {renderedTemplate}
           </div>
         ) : (
           <p className="rounded bg-[#f2f4f6] p-4 text-[13px] text-[#424752]">
