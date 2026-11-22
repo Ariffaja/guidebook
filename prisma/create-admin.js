@@ -1,5 +1,5 @@
 
-const { PrismaClient } = require("@prisma/client");
+const { PrismaClient } = require("../src/generated/prisma");
 const bcrypt = require("bcryptjs");
 const readline = require("node:readline/promises");
 const { stdin, stdout } = require("node:process");
@@ -51,5 +51,3 @@ main()
   .finally(async () => {
     await prisma.$disconnect();
   });
-
-  

@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { useState, type FormEvent } from "react";
 import Icon from "@/components/ui/Icon";
-import { importInternAccounts, previewInternImport, type InternImportRow } from "@/app/account-management/actions";
+import { importInternAccounts, previewInternImport } from "@/app/account-management/actions";
+import type { InternImportRow } from "@/lib/internImport";
 
 export default function InternAccountImport() {
   const [rows, setRows] = useState<InternImportRow[] | null>(null);

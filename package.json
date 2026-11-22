@@ -4,9 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "prisma generate && next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "db:seed": "node prisma/seed.js",
+    "db:create-admin": "node prisma/create-admin.js"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",

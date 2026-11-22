@@ -1,9 +1,6 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
 import PageTransition from "@/components/ui/PageTransition";
-
-const inter = Inter({ subsets: ["latin"], display: "swap" });
 
 export const metadata: Metadata = {
   title: "GUIDEBOOK ADMINDUK - Disdukcapil Sidoarjo",
@@ -22,7 +19,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap"
         />
       </head>
-      <body className={`${inter.className} min-h-screen bg-[#F7F9FB] antialiased`}>
+      <body className="min-h-screen bg-[#F7F9FB] antialiased">
         <PageTransition>{children}</PageTransition>
       </body>
     </html>
