@@ -9,7 +9,6 @@ type SidebarProps = {
   drawer?: boolean;
   /** Dipanggil saat sebuah tautan diklik, dipakai untuk menutup menu geser. */
   onNavigate?: () => void;
-  isAdmin?: boolean;
 };
 
 type NavItem = {
@@ -70,12 +69,12 @@ function NavSection({
   );
 }
 
-export default function Sidebar({ drawer = false, onNavigate, isAdmin = false }: SidebarProps) {
+export default function Sidebar({ drawer = false, onNavigate }: SidebarProps) {
   const pathname = usePathname();
 
   return (
     <aside
-      className={`fixed left-0 top-0 z-50 h-full w-72 flex-col justify-between border-r border-slate-200/80 bg-white shadow-sm ${
+      className={`fixed bottom-2 left-2 top-2 z-50 h-auto w-72 flex-col justify-between overflow-hidden rounded-xl border-r border-slate-200/80 bg-white shadow-sm ${
         drawer ? "flex" : "hidden lg:flex"
       }`}
     >
@@ -101,7 +100,6 @@ export default function Sidebar({ drawer = false, onNavigate, isAdmin = false }:
           title="Menu Utama"
           items={[
             ...documentationNav,
-            ...(isAdmin ? [{ label: "SOP Management", href: "/sop-management", icon: "settings" }] : []),
             { label: "Tentang", href: "/tentang", icon: "info" },
           ]}
           pathname={pathname}

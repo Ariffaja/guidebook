@@ -8,7 +8,7 @@ import Sidebar from "./Sidebar";
  * Menu geser untuk layar di bawah breakpoint lg (tablet/ponsel), tempat Sidebar tetap disembunyikan.
  * Tombol hanya tampil di bawah lg, sehingga tampilan desktop tidak berubah.
  */
-export default function MobileNav({ isAdmin = false }: { isAdmin?: boolean }) {
+export default function MobileNav() {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -47,7 +47,7 @@ export default function MobileNav({ isAdmin = false }: { isAdmin?: boolean }) {
             onClick={() => setOpen(false)}
             className="absolute inset-0 bg-slate-900/40"
           />
-          <Sidebar drawer isAdmin={isAdmin} onNavigate={() => setOpen(false)} />
+          <Sidebar drawer onNavigate={() => setOpen(false)} />
         </div>
       )}
     </>

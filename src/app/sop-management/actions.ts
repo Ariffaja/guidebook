@@ -87,7 +87,7 @@ export async function createSopCase(_previous: SopFormState, formData: FormData)
   });
   revalidatePath("/sop-directory");
   revalidatePath("/sop-management");
-  redirect("/sop-management?status=created");
+  redirect("/sop-directory?status=created");
 }
 
 export async function updateSopCase(
@@ -108,23 +108,23 @@ export async function updateSopCase(
 
   revalidatePath("/sop-directory");
   revalidatePath("/sop-management");
-  redirect("/sop-management?status=updated");
+  redirect("/sop-directory?status=updated");
 }
 
 export async function deleteSopCase(formData: FormData): Promise<void> {
   await requireAdmin();
   const id = String(formData.get("id") ?? "");
-  if (!id) redirect("/sop-management?status=error");
+  if (!id) redirect("/sop-directory?status=error");
   await getSopCases();
 
   try {
     await prisma.sopCase.delete({ where: { id } });
   } catch {
-    redirect("/sop-management?status=error");
+    redirect("/sop-directory?status=error");
   }
 
   revalidatePath("/sop-directory");
   revalidatePath("/sop-management");
-  redirect("/sop-management?status=deleted");
+  redirect("/sop-directory?status=deleted");
 }
 

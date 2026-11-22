@@ -67,11 +67,11 @@ export default function SopCaseForm({ initial }: { initial?: SopCase }) {
   return (
     <div className="mx-auto w-full max-w-3xl pb-8">
       <Link
-        href="/sop-management"
+        href="/sop-directory"
         className="mb-5 inline-flex items-center gap-1.5 text-sm font-medium text-[#0056B3] hover:text-[#003F87]"
       >
         <Icon name="arrow_back" className="text-[18px]" />
-        Kembali ke SOP Management
+        Kembali ke SOP Directory
       </Link>
 
       <div className="mb-5">
@@ -263,7 +263,7 @@ export default function SopCaseForm({ initial }: { initial?: SopCase }) {
 
         <div className="flex justify-end gap-2 border-t border-[#eceef0] pt-5">
           <Link
-            href="/sop-management"
+            href="/sop-directory"
             className="rounded-lg border border-[#c2c6d4] px-4 py-2.5 text-sm font-medium text-[#424752] hover:bg-[#f2f4f6]"
           >
             Batal
