@@ -101,7 +101,6 @@ export default function Sidebar({ drawer = false, onNavigate, isAdmin = false }:
           title="Menu Utama"
           items={[
             ...documentationNav,
-            ...(isAdmin ? [{ label: "SOP Management", href: "/sop-management", icon: "settings" }] : []),
             ...(isAdmin ? [{ label: "Manajemen Akun", href: "/account-management", icon: "manage_accounts" }] : []),
             { label: "Tentang", href: "/tentang", icon: "info" },
           ]}

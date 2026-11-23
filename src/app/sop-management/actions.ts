@@ -15,10 +15,10 @@ const allowedTypes = {
   capil: ["kematian", "kelahiran"],
 } as const;
 
-async function requireAdmin() {
+async function requireSopManager() {
   const session = await auth();
   if (!session?.user || !session.user.isActive) redirect("/login");
-  if (session.user.role !== "ADMIN") redirect("/");
+  if (session.user.role !== "ADMIN" && session.user.role !== "MENTOR") redirect("/");
 }
 
 function readForm(formData: FormData) {
@@ -76,7 +76,7 @@ function readForm(formData: FormData) {
 }
 
 export async function createSopCase(_previous: SopFormState, formData: FormData): Promise<SopFormState> {
-  await requireAdmin();
+  await requireSopManager();
   const parsed = readForm(formData);
   if ("error" in parsed) return parsed;
   await getSopCases();
@@ -95,7 +95,7 @@ export async function updateSopCase(
   _previous: SopFormState,
   formData: FormData,
 ): Promise<SopFormState> {
-  await requireAdmin();
+  await requireSopManager();
   const parsed = readForm(formData);
   if ("error" in parsed) return parsed;
   await getSopCases();
@@ -112,7 +112,7 @@ export async function updateSopCase(
 }
 
 export async function deleteSopCase(formData: FormData): Promise<void> {
-  await requireAdmin();
+  await requireSopManager();
   const id = String(formData.get("id") ?? "");
   if (!id) redirect("/sop-directory?status=error");
   await getSopCases();
