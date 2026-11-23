@@ -5,7 +5,7 @@ import Link from "next/link";
 import Icon from "@/components/ui/Icon";
 import { toggleAccountStatus } from "@/app/account-management/actions";
 
-export type AccountRow = { id: number; name: string; email: string; role: string; isActive: boolean };
+export type AccountRow = { id: number; name: string; email: string; role: string; isActive: boolean; sopDivisions: ("DAFDUK" | "CAPIL")[] };
 type RoleFilter = "all" | "ADMIN" | "MENTOR" | "MAGANG";
 type StatusFilter = "all" | "active" | "inactive";
 
@@ -53,7 +53,12 @@ export default function AccountManagement({ accounts, currentUserId, status }: {
             <tbody className="divide-y divide-[#eceef0]">
               {visibleAccounts.map((account) => <tr key={account.id} className="hover:bg-[#f8f9fb]">
                 <td className="px-3 py-3.5"><p className="font-semibold text-[#191c1e]">{account.name}{account.id === currentUserId && <span className="ml-2 text-xs font-normal text-[#727784]">(akunmu)</span>}</p><p className="mt-0.5 text-xs text-[#727784]">{account.email}</p></td>
-                <td className="px-3 py-3.5"><span className="rounded-md bg-[#edf2ff] px-2 py-1 text-xs font-semibold text-[#234c9b]">{roleLabels[account.role] ?? account.role}</span></td>
+                <td className="px-3 py-3.5">
+                  <span className="inline-flex max-w-full flex-wrap items-center rounded-md bg-[#edf2ff] px-2 py-1 text-xs font-semibold leading-5 text-[#234c9b]">
+                    {roleLabels[account.role] ?? account.role}
+                    {account.role === "MENTOR" && ` · ${account.sopDivisions.map((division) => division === "DAFDUK" ? "Dafduk" : "Capil").join(" · ") || "Belum ada divisi"}`}
+                  </span>
+                </td>
                 <td className="px-3 py-3.5"><span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ${account.isActive ? "bg-emerald-50 text-emerald-800" : "bg-slate-100 text-slate-600"}`}><span className={`h-1.5 w-1.5 rounded-full ${account.isActive ? "bg-emerald-600" : "bg-slate-400"}`} />{account.isActive ? "Aktif" : "Nonaktif"}</span></td>
                 <td className="px-3 py-3.5"><div className="flex justify-end gap-2"><Link href={`/account-management/${account.id}/edit`} className="inline-flex items-center gap-1 rounded-md border border-[#d5d9e0] px-2.5 py-1.5 text-xs font-semibold text-[#0056B3] hover:bg-[#edf4ff]"><Icon name="edit" className="text-[16px]" />Edit</Link>
                   <form action={toggleAccountStatus} onSubmit={(event) => { const action = account.isActive ? "menonaktifkan" : "mengaktifkan"; if (!window.confirm(`Yakin ingin ${action} akun ${account.name}?`)) event.preventDefault(); }}><input type="hidden" name="id" value={account.id} /><button disabled={account.id === currentUserId} title={account.id === currentUserId ? "Akun yang sedang digunakan tidak dapat dinonaktifkan" : undefined} className={`rounded-md border px-2.5 py-1.5 text-xs font-semibold disabled:cursor-not-allowed disabled:opacity-50 ${account.isActive ? "border-amber-300 text-amber-800 hover:bg-amber-50" : "border-emerald-300 text-emerald-800 hover:bg-emerald-50"}`}>{account.isActive ? "Nonaktifkan" : "Aktifkan"}</button></form>

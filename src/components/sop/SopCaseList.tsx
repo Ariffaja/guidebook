@@ -26,7 +26,8 @@ type SopCaseListProps = {
   onSelect: (id: string) => void;
   onReset: () => void;
   onEdit?: (sopCase: SopCase) => void;
-  onDelete?: (sopCase: SopCase) => void;
+  onArchive?: (sopCase: SopCase) => void;
+  onRestore?: (sopCase: SopCase) => void;
 };
 
 export default function SopCaseList({
@@ -36,7 +37,8 @@ export default function SopCaseList({
   onSelect,
   onReset,
   onEdit,
-  onDelete,
+  onArchive,
+  onRestore,
 }: SopCaseListProps) {
   if (cases.length === 0) {
     return (
@@ -90,7 +92,7 @@ export default function SopCaseList({
                   </span>
                 )}
               </button>
-              {(onEdit || onDelete) && (
+              {(onEdit || onArchive || onRestore) && (
                 <div className="flex justify-end gap-3 border-t border-[#eceef0] px-4 py-2.5">
                   {onEdit && (
                     <button
@@ -102,14 +104,24 @@ export default function SopCaseList({
                       Edit
                     </button>
                   )}
-                  {onDelete && (
+                  {onArchive && (
                     <button
                       type="button"
-                      onClick={() => onDelete(c)}
-                      className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#ba1a1a] hover:text-[#93000a] focus-visible:outline-2 focus-visible:outline-[#ba1a1a]"
+                      onClick={() => onArchive(c)}
+                      className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#59616d] hover:text-[#191c1e] focus-visible:outline-2 focus-visible:outline-[#0056B3]"
                     >
-                      <Icon name="delete" className="text-[16px]" />
-                      Hapus
+                      <Icon name="archive" className="text-[16px]" />
+                      Arsipkan
+                    </button>
+                  )}
+                  {onRestore && (
+                    <button
+                      type="button"
+                      onClick={() => onRestore(c)}
+                      className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#0056B3] hover:text-[#003F87] focus-visible:outline-2 focus-visible:outline-[#0056B3]"
+                    >
+                      <Icon name="unarchive" className="text-[16px]" />
+                      Kembalikan
                     </button>
                   )}
                 </div>

@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { auth } from "../../../auth";
 import { prisma } from "@/lib/prisma";
 import { getSopCases } from "@/lib/sopCases";
+import { getSopAccess } from "@/lib/sopAccess";
 import { SOP_DEADLINE_TOKEN } from "@/components/sop/sopDeadline";
 
 export type SopFormState = { error?: string };
@@ -18,7 +19,9 @@ const allowedTypes = {
 async function requireSopManager() {
   const session = await auth();
   if (!session?.user || !session.user.isActive) redirect("/login");
-  if (session.user.role !== "ADMIN" && session.user.role !== "MENTOR") redirect("/");
+  const access = await getSopAccess(Number(session.user.id));
+  if (!access?.canManage) redirect("/");
+  return access;
 }
 
 function readForm(formData: FormData) {
@@ -76,9 +79,10 @@ function readForm(formData: FormData) {
 }
 
 export async function createSopCase(_previous: SopFormState, formData: FormData): Promise<SopFormState> {
-  await requireSopManager();
+  const access = await requireSopManager();
   const parsed = readForm(formData);
   if ("error" in parsed) return parsed;
+  if (!access.categories.includes(parsed.data.category)) return { error: "Kamu tidak memiliki akses ke divisi SOP tersebut." };
   await getSopCases();
   const lastPosition = await prisma.sopCase.aggregate({ _max: { sortOrder: true } });
 
@@ -95,12 +99,17 @@ export async function updateSopCase(
   _previous: SopFormState,
   formData: FormData,
 ): Promise<SopFormState> {
-  await requireSopManager();
+  const access = await requireSopManager();
   const parsed = readForm(formData);
   if ("error" in parsed) return parsed;
+  if (!access.categories.includes(parsed.data.category)) return { error: "Kamu tidak memiliki akses ke divisi SOP tersebut." };
   await getSopCases();
 
   try {
+    const existing = await prisma.sopCase.findUnique({ where: { id }, select: { category: true, isArchived: true } });
+    if (!existing || existing.isArchived || !access.categories.includes(existing.category as "dafduk" | "capil")) {
+      return { error: "Kasus tidak ditemukan atau kamu tidak memiliki akses untuk mengubahnya." };
+    }
     await prisma.sopCase.update({ where: { id }, data: parsed.data });
   } catch {
     return { error: "Kasus tidak ditemukan atau gagal diperbarui. Muat ulang halaman lalu coba lagi." };
@@ -111,20 +120,42 @@ export async function updateSopCase(
   redirect("/sop-directory?status=updated");
 }
 
-export async function deleteSopCase(formData: FormData): Promise<void> {
-  await requireSopManager();
+async function setSopCaseArchived(formData: FormData, isArchived: boolean): Promise<void> {
+  const access = await requireSopManager();
   const id = String(formData.get("id") ?? "");
   if (!id) redirect("/sop-directory?status=error");
-  await getSopCases();
+  await getSopCases(access.categories, isArchived);
+
+  let existing: { category: string; isArchived: boolean } | null;
+  try {
+    existing = await prisma.sopCase.findUnique({ where: { id }, select: { category: true, isArchived: true } });
+  } catch {
+    redirect("/sop-directory?status=error");
+  }
+  if (
+    !existing ||
+    !access.categories.includes(existing.category as "dafduk" | "capil") ||
+    existing.isArchived === isArchived
+  ) {
+    redirect("/sop-directory?status=error");
+  }
 
   try {
-    await prisma.sopCase.delete({ where: { id } });
+    await prisma.sopCase.update({ where: { id }, data: { isArchived } });
   } catch {
     redirect("/sop-directory?status=error");
   }
 
   revalidatePath("/sop-directory");
   revalidatePath("/sop-management");
-  redirect("/sop-directory?status=deleted");
+  redirect(isArchived ? "/sop-directory?status=archived" : "/sop-directory?status=restored");
+}
+
+export async function archiveSopCase(formData: FormData): Promise<void> {
+  await setSopCaseArchived(formData, true);
+}
+
+export async function restoreSopCase(formData: FormData): Promise<void> {
+  await setSopCaseArchived(formData, false);
 }
 

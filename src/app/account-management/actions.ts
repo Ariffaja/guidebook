@@ -6,6 +6,7 @@ import bcrypt from "bcryptjs";
 import { auth } from "../../../auth";
 import { prisma } from "@/lib/prisma";
 import { MAX_INTERN_IMPORT_ROWS, parseInternWorkbook, type InternImportRow } from "@/lib/internImport";
+import { isSopDivisionKey } from "@/lib/sopAccess";
 
 export type AccountFormState = { error?: string };
 export type PasswordFormState = { error?: string; success?: string };
@@ -24,10 +25,15 @@ function readAccountForm(formData: FormData) {
   const name = String(formData.get("name") ?? "").trim();
   const email = String(formData.get("email") ?? "").trim().toLowerCase();
   const role = String(formData.get("role") ?? "");
+  const rawDivisions = formData.getAll("sopDivisions").map(String);
   if (!name || name.length > 100) return { error: "Nama wajib diisi dan maksimal 100 karakter." } as const;
   if (!email || email.length > 191 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return { error: "Masukkan alamat email yang valid." } as const;
   if (!allowedRoles.includes(role as (typeof allowedRoles)[number])) return { error: "Pilih role akun yang tersedia." } as const;
-  return { data: { name, email, role } } as const;
+  if (role === "MENTOR" && (rawDivisions.length === 0 || rawDivisions.some((division) => !isSopDivisionKey(division)))) {
+    return { error: "Pilih minimal satu divisi SOP untuk akun mentor." } as const;
+  }
+  const sopDivisions = role === "MENTOR" ? [...new Set(rawDivisions.filter(isSopDivisionKey))] : [];
+  return { data: { name, email, role, sopDivisions } } as const;
 }
 
 async function getRoleId(role: string) {
@@ -37,6 +43,7 @@ async function getRoleId(role: string) {
 
 function revalidateAccountPages() {
   revalidatePath("/account-management");
+  revalidatePath("/sop-directory");
   revalidatePath("/");
 }
 
@@ -50,7 +57,15 @@ export async function createAccount(_previous: AccountFormState, formData: FormD
   if (!roleId) return { error: "Role belum tersedia. Jalankan seed role terlebih dahulu." };
 
   try {
-    await prisma.user.create({ data: { name: parsed.data.name, email: parsed.data.email, roleId, password: await bcrypt.hash(password, 12) } });
+    await prisma.user.create({
+      data: {
+        name: parsed.data.name,
+        email: parsed.data.email,
+        roleId,
+        password: await bcrypt.hash(password, 12),
+        sopDivisions: { create: parsed.data.sopDivisions.map((division) => ({ division })) },
+      },
+    });
   } catch {
     return { error: "Email sudah terdaftar atau akun gagal dibuat." };
   }
@@ -75,6 +90,12 @@ export async function updateAccount(id: number, _previous: AccountFormState, for
         if (activeAdmins <= 1) throw new Error("LAST_ACTIVE_ADMIN");
       }
       await tx.user.update({ where: { id }, data: { name: parsed.data.name, email: parsed.data.email, roleId } });
+      await tx.userSopDivision.deleteMany({ where: { userId: id } });
+      if (parsed.data.sopDivisions.length) {
+        await tx.userSopDivision.createMany({
+          data: parsed.data.sopDivisions.map((division) => ({ userId: id, division })),
+        });
+      }
     }, { isolationLevel: "Serializable" });
   } catch (error) {
     if (error instanceof Error && error.message === "ACCOUNT_NOT_FOUND") return { error: "Akun tidak ditemukan." };

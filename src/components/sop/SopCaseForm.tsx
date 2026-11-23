@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useActionState, useRef, useState, type KeyboardEvent } from "react";
 import Icon from "@/components/ui/Icon";
 import { createSopCase, updateSopCase } from "@/app/sop-management/actions";
-import type { SopCase, SopCategory, SopCaseType } from "./sopTypes";
+import { sopCategories, type SopCase, type SopCategory, type SopCaseType } from "./sopTypes";
 import { SOP_DEADLINE_TOKEN } from "./sopDeadline";
 
 const caseTypes: Record<SopCategory, { value: SopCaseType; label: string }[]> = {
@@ -21,11 +21,14 @@ const caseTypes: Record<SopCategory, { value: SopCaseType; label: string }[]> = 
 const inputClass =
   "mt-1.5 w-full rounded-lg border border-[#c2c6d4] bg-white px-3.5 py-2.5 text-sm text-[#191c1e] outline-none transition focus:border-[#0056B3] focus:ring-2 focus:ring-[#0056B3]/15";
 
-export default function SopCaseForm({ initial }: { initial?: SopCase }) {
+export default function SopCaseForm({ initial, allowedCategories = ["dafduk", "capil"] }: { initial?: SopCase; allowedCategories?: SopCategory[] }) {
   const isEditing = Boolean(initial);
   const action = initial ? updateSopCase.bind(null, initial.id) : createSopCase;
   const [state, formAction, pending] = useActionState(action, {});
-  const [category, setCategory] = useState<SopCategory>(initial?.category ?? "dafduk");
+  const initialCategory = initial?.category && allowedCategories.includes(initial.category)
+    ? initial.category
+    : allowedCategories[0] ?? "dafduk";
+  const [category, setCategory] = useState<SopCategory>(initialCategory);
   const [caseType, setCaseType] = useState<string>(initial?.caseType ?? "");
   const [classification, setClassification] = useState(initial?.classification ?? "");
   const [deadlineEnabled, setDeadlineEnabled] = useState(Boolean(initial?.deadlineBusinessDays));
@@ -94,8 +97,9 @@ export default function SopCaseForm({ initial }: { initial?: SopCase }) {
               className={inputClass}
               required
             >
-              <option value="dafduk">Dafduk — Pendaftaran Penduduk</option>
-              <option value="capil">Capil — Pencatatan Sipil</option>
+              {sopCategories.filter((item) => allowedCategories.includes(item.key)).map((item) => (
+                <option key={item.key} value={item.key}>{item.label} — {item.subtitle}</option>
+              ))}
             </select>
           </label>
 

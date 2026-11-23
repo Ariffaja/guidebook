@@ -4,20 +4,32 @@ import AppLayout from "@/components/layout/AppLayout";
 import SopDirectory from "@/components/sop/SopDirectory";
 import { getSopCases } from "@/lib/sopCases";
 import { getHolidayCalendarData } from "@/lib/holidayCalendar";
+import { getSopAccess } from "@/lib/sopAccess";
 
 export const metadata: Metadata = {
   title: "SOP Directory - GUIDEBOOK ADMINDUK",
 };
 
-export default async function SopDirectoryPage({ searchParams }: { searchParams?: Promise<{ status?: string }> }) {
+export default async function SopDirectoryPage({ searchParams }: { searchParams?: Promise<{ status?: string; view?: string }> }) {
   const session = await auth();
-  const [cases, calendar] = await Promise.all([getSopCases(), getHolidayCalendarData()]);
-  const { status } = searchParams ? await searchParams : {};
-  const canManage = session?.user?.role === "ADMIN" || session?.user?.role === "MENTOR";
+  const access = session?.user ? await getSopAccess(Number(session.user.id)) : null;
+  const params = searchParams ? await searchParams : {};
+  const showArchived = Boolean(access?.canManage && params.view === "archive");
+  const [cases, calendar] = await Promise.all([
+    getSopCases(access?.categories ?? [], showArchived),
+    getHolidayCalendarData(),
+  ]);
 
   return (
     <AppLayout pageLabel="SOP Directory">
-      <SopDirectory cases={cases} canManage={canManage} status={status} {...calendar} />
+      <SopDirectory
+        cases={cases}
+        allowedCategories={access?.categories ?? []}
+        canManage={access?.canManage ?? false}
+        showArchived={showArchived}
+        status={params.status}
+        {...calendar}
+      />
     </AppLayout>
   );
 }

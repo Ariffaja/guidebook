@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { sopCases as legacyCases } from "@/components/sop/sopCases";
 import type { SopCase } from "@/components/sop/sopTypes";
+import type { SopCategory } from "@/components/sop/sopTypes";
 
 let legacyImport: Promise<void> | null = null;
 
@@ -49,9 +50,14 @@ async function ensureInitialCases() {
   await legacyImport;
 }
 
-export async function getSopCases(): Promise<SopCase[]> {
+export async function getSopCases(categories?: SopCategory[], archived = false): Promise<SopCase[]> {
   await ensureInitialCases();
+  if (categories && categories.length === 0) return [];
   const records = await prisma.sopCase.findMany({
+    where: {
+      isArchived: archived,
+      ...(categories ? { category: { in: categories } } : {}),
+    },
     orderBy: { sortOrder: "asc" },
   });
 
@@ -66,5 +72,6 @@ export async function getSopCases(): Promise<SopCase[]> {
     description: record.description ?? undefined,
     template: record.template ?? undefined,
     keywords: Array.isArray(record.keywords) ? record.keywords.map(String) : undefined,
+    isArchived: record.isArchived,
   }));
 }

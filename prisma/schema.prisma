@@ -31,8 +31,23 @@ model User {
   roleId    Int
   isActive  Boolean  @default(true)
   role      Role     @relation(fields: [roleId], references: [id])
+  sopDivisions UserSopDivision[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+enum SopDivision {
+  DAFDUK
+  CAPIL
+}
+
+model UserSopDivision {
+  userId   Int
+  division SopDivision
+  user     User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, division])
+  @@index([division])
 }
 
 model SopCase {
@@ -47,6 +62,7 @@ model SopCase {
   description          String?  @db.Text
   template             String?  @db.LongText
   keywords             Json?
+  isArchived           Boolean  @default(false)
   createdAt            DateTime @default(now())
   updatedAt            DateTime @updatedAt
 

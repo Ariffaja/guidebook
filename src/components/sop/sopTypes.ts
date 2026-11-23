@@ -29,6 +29,7 @@ export type SopCase = {
   template?: string;
   /** Kata kunci tambahan khusus pencarian (opsional). */
   keywords?: string[];
+  isArchived?: boolean;
 };
 
 export type SopCategoryMeta = {
