@@ -10,7 +10,7 @@ type SopFilterBarProps = {
 };
 
 const chipBase =
-  "rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0056B3] disabled:cursor-not-allowed disabled:opacity-40";
+  "cursor-pointer rounded-lg border border-transparent px-3 py-1.5 text-xs font-semibold transition-all hover:-translate-y-0.5 hover:scale-[1.02] hover:border-[#0056B3] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0056B3] disabled:cursor-not-allowed disabled:opacity-40";
 
 /** Chip filter klasifikasi dan penghitung hasil. */
 export default function SopFilterBar({

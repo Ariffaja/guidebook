@@ -5,6 +5,7 @@ import AppLayout from "@/components/layout/AppLayout";
 import Breadcrumb from "@/components/ui/Breadcrumb";
 import { dafdukServices } from "@/components/dafduk/services";
 import PindahKeluarClassification from "@/components/dafduk/PindahKeluarClassification";
+import DafdukPindahDatangVerification from "@/components/dafduk/DafdukPindahDatangVerification";
 
 type DafdukServicePageProps = {
   params: Promise<{ service: string }>;
@@ -20,6 +21,14 @@ export default async function DafdukServicePage({ params }: DafdukServicePagePro
   const { service: serviceKey } = await params;
   const service = dafdukServices.find((item) => item.key === serviceKey);
   if (!service) notFound();
+
+  if (service.key === "pindah-datang") {
+    return (
+      <AppLayout pageLabel="Pendaftaran Kependudukan">
+        <DafdukPindahDatangVerification />
+      </AppLayout>
+    );
+  }
 
   if (service.key === "pindah-keluar") {
     return (

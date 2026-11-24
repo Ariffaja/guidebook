@@ -23,12 +23,14 @@ type ToastState = { id: number; icon: string; message: ReactNode };
 
 /** Lebar layar (px) mulai dari mana daftar dan detail tampil berdampingan (breakpoint xl). */
 const SPLIT_LAYOUT_MIN_WIDTH = 1280;
+const CASES_PER_PAGE = 5;
 
 export default function SopDirectory({ cases, holidays, completeYears, allowedCategories = ["dafduk", "capil"], canManage = false, showArchived = false, status }: { cases: SopCase[]; holidays: string[]; completeYears: number[]; allowedCategories?: SopCategory[]; canManage?: boolean; showArchived?: boolean; status?: string }) {
   const router = useRouter();
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<CategoryFilter>("all");
   const [classification, setClassification] = useState<ClassificationFilter>("all");
+  const [currentPage, setCurrentPage] = useState(1);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [archiveTarget, setArchiveTarget] = useState<SopCase | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -42,6 +44,12 @@ export default function SopDirectory({ cases, holidays, completeYears, allowedCa
   const filtered = useMemo(
     () => filterCases(cases, { query, category, classification }),
     [cases, query, category, classification],
+  );
+  const pageCount = Math.max(1, Math.ceil(filtered.length / CASES_PER_PAGE));
+  const displayedPage = Math.min(currentPage, pageCount);
+  const pageCases = filtered.slice(
+    (displayedPage - 1) * CASES_PER_PAGE,
+    displayedPage * CASES_PER_PAGE,
   );
   const classificationCounts = useMemo(
     () => countClassifications(cases, { query, category }),
@@ -59,10 +67,11 @@ export default function SopDirectory({ cases, holidays, completeYears, allowedCa
   const statusMessage = statusMessages[status ?? ""];
 
   function handleSelect(id: string) {
-    setSelectedId(id);
+    const isDeselecting = selectedId === id;
+    setSelectedId(isDeselecting ? null : id);
     setCopiedId(null);
     // Pada layar sempit detail berada di bawah daftar, jadi gulir ke panel detail.
-    if (window.innerWidth < SPLIT_LAYOUT_MIN_WIDTH) {
+    if (!isDeselecting && window.innerWidth < SPLIT_LAYOUT_MIN_WIDTH) {
       detailRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     }
   }
@@ -71,6 +80,7 @@ export default function SopDirectory({ cases, holidays, completeYears, allowedCa
     setQuery("");
     setCategory("all");
     setClassification("all");
+    setCurrentPage(1);
   }
 
   async function handleCopy(sopCase: SopCase) {
@@ -110,10 +120,10 @@ export default function SopDirectory({ cases, holidays, completeYears, allowedCa
           <p className="max-w-3xl text-base text-[#424752]">Pusat informasi kasus dan templat respons operasional pelayanan administrasi kependudukan.</p>
         </div>
         {canManage && <div className="flex shrink-0 flex-wrap gap-2">
-          <button type="button" onClick={() => router.push(showArchived ? "/sop-directory" : "/sop-directory?view=archive")} className="inline-flex items-center justify-center gap-2 rounded-lg border border-[#9bb8dc] bg-white px-4 py-2.5 text-sm font-semibold text-[#0056B3] transition-colors hover:bg-[#edf4ff] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0056B3]">
+          <button type="button" onClick={() => router.push(showArchived ? "/sop-directory" : "/sop-directory?view=archive")} className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-[#9bb8dc] bg-white px-4 py-2.5 text-sm font-semibold text-[#0056B3] transition-all hover:scale-[1.03] hover:bg-[#edf4ff] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0056B3]">
             <Icon name={showArchived ? "menu_book" : "archive"} className="text-[20px]" /> {showArchived ? "SOP Aktif" : "Lihat Arsip"}
           </button>
-          {!showArchived && <button type="button" onClick={() => router.push("/sop-management/new")} className="inline-flex items-center justify-center gap-2 rounded-lg bg-[#0056B3] px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#003F87] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0056B3]">
+          {!showArchived && <button type="button" onClick={() => router.push("/sop-management/new")} className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-lg bg-[#0056B3] px-4 py-2.5 text-sm font-semibold text-white transition-all hover:scale-[1.03] hover:bg-[#003F87] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0056B3]">
             <Icon name="add" className="text-[20px]" /> Tambah Kasus
           </button>}
         </div>}
@@ -127,7 +137,7 @@ export default function SopDirectory({ cases, holidays, completeYears, allowedCa
         <input
           type="text"
           value={query}
-          onChange={(event) => setQuery(event.target.value)}
+          onChange={(event) => { setQuery(event.target.value); setCurrentPage(1); }}
           aria-label="Cari kasus, persyaratan, atau permasalahan"
           placeholder="Cari kasus, persyaratan, atau permasalahan..."
           className="w-full bg-transparent text-base text-[#191c1e] placeholder:text-[#727784] focus:outline-none"
@@ -135,7 +145,7 @@ export default function SopDirectory({ cases, holidays, completeYears, allowedCa
         {query && (
           <button
             type="button"
-            onClick={() => setQuery("")}
+            onClick={() => { setQuery(""); setCurrentPage(1); }}
             aria-label="Hapus pencarian"
             className="rounded p-1 text-[#727784] transition-colors hover:bg-[#eceef0] hover:text-[#191c1e] focus-visible:outline-2 focus-visible:outline-[#0056B3]"
           >
@@ -152,8 +162,8 @@ export default function SopDirectory({ cases, holidays, completeYears, allowedCa
               key={meta.key}
               type="button"
               aria-pressed={active}
-              onClick={() => setCategory(active ? "all" : meta.key)}
-              className={`flex items-center gap-3 rounded-lg border p-3.5 text-left shadow-sm transition-all hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0056B3] ${
+              onClick={() => { setCategory(active ? "all" : meta.key); setCurrentPage(1); }}
+              className={`flex cursor-pointer items-center gap-3 rounded-lg border p-3.5 text-left shadow-sm transition-all hover:-translate-y-0.5 hover:scale-[1.01] hover:border-[#0056B3] hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0056B3] ${
                 active ? "border-[#0056B3] bg-[#d7e2ff]/40" : "border-[#c2c6d4]/40 bg-white"
               }`}
             >
@@ -182,7 +192,7 @@ export default function SopDirectory({ cases, holidays, completeYears, allowedCa
 
       <SopFilterBar
         classification={classification}
-        onChange={setClassification}
+        onChange={(value) => { setClassification(value); setCurrentPage(1); }}
         counts={classificationCounts}
         shown={filtered.length}
         total={cases.length}
@@ -191,7 +201,7 @@ export default function SopDirectory({ cases, holidays, completeYears, allowedCa
       <div className="grid grid-cols-1 items-start gap-6 xl:grid-cols-12">
         <div className="xl:col-span-7">
           <SopCaseList
-            cases={filtered}
+            cases={pageCases}
             tokens={tokens}
             selectedId={selectedCase?.id ?? null}
             onSelect={handleSelect}
@@ -200,6 +210,26 @@ export default function SopDirectory({ cases, holidays, completeYears, allowedCa
             onArchive={canManage && !showArchived ? setArchiveTarget : undefined}
             onRestore={canManage && showArchived ? setArchiveTarget : undefined}
           />
+          {filtered.length > CASES_PER_PAGE && (
+            <nav aria-label="Navigasi halaman daftar SOP" className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-lg bg-white px-4 py-3 shadow-sm">
+              <p className="text-sm text-[#59616d]">
+                Menampilkan {(displayedPage - 1) * CASES_PER_PAGE + 1}–{Math.min(displayedPage * CASES_PER_PAGE, filtered.length)} dari {filtered.length} kasus
+              </p>
+              <div className="flex items-center gap-1.5">
+                <button type="button" onClick={() => setCurrentPage(Math.max(1, displayedPage - 1))} disabled={displayedPage === 1} aria-label="Halaman sebelumnya" title="Halaman sebelumnya" className="inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-md border border-[#c2c6d4] text-[#424752] transition-colors hover:bg-[#edf4ff] disabled:cursor-not-allowed disabled:opacity-45">
+                  <Icon name="chevron_left" className="text-[20px]" />
+                </button>
+                {Array.from({ length: pageCount }, (_, index) => index + 1).map((page) => (
+                  <button key={page} type="button" onClick={() => setCurrentPage(page)} aria-label={`Halaman ${page}`} aria-current={displayedPage === page ? "page" : undefined} className={`h-9 min-w-9 rounded-md px-2 text-sm font-semibold transition-colors ${displayedPage === page ? "bg-[#0056B3] text-white" : "text-[#424752] hover:bg-[#edf4ff]"}`}>
+                    {page}
+                  </button>
+                ))}
+                <button type="button" onClick={() => setCurrentPage(Math.min(pageCount, displayedPage + 1))} disabled={displayedPage === pageCount} aria-label="Halaman berikutnya" title="Halaman berikutnya" className="inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-md border border-[#c2c6d4] text-[#424752] transition-colors hover:bg-[#edf4ff] disabled:cursor-not-allowed disabled:opacity-45">
+                  <Icon name="chevron_right" className="text-[20px]" />
+                </button>
+              </div>
+            </nav>
+          )}
         </div>
         <div ref={detailRef} className="scroll-mt-20 xl:sticky xl:top-20 xl:col-span-5">
           <SopCaseDetail
