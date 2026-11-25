@@ -10,10 +10,12 @@ import SopCaseList from "./SopCaseList";
 import SopFilterBar from "./SopFilterBar";
 import {
   countByCategory,
+  countCaseTypes,
   countClassifications,
   filterCases,
   tokenize,
   type CategoryFilter,
+  type CaseTypeFilter,
   type ClassificationFilter,
 } from "./sopFilter";
 import { sopCategories, type SopCase, type SopCategory } from "./sopTypes";
@@ -28,6 +30,7 @@ export default function SopDirectory({ cases, holidays, completeYears, allowedCa
   const router = useRouter();
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<CategoryFilter>("all");
+  const [caseType, setCaseType] = useState<CaseTypeFilter>("all");
   const [classification, setClassification] = useState<ClassificationFilter>("all");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [archiveTarget, setArchiveTarget] = useState<SopCase | null>(null);
@@ -40,12 +43,16 @@ export default function SopDirectory({ cases, holidays, completeYears, allowedCa
   const tokens = useMemo(() => tokenize(query), [query]);
   const categoryCounts = useMemo(() => countByCategory(cases), [cases]);
   const filtered = useMemo(
-    () => filterCases(cases, { query, category, classification }),
-    [cases, query, category, classification],
+    () => filterCases(cases, { query, category, caseType, classification }),
+    [cases, query, category, caseType, classification],
   );
   const classificationCounts = useMemo(
-    () => countClassifications(cases, { query, category }),
-    [cases, query, category],
+    () => countClassifications(cases, { query, category, caseType }),
+    [cases, query, category, caseType],
+  );
+  const caseTypeCounts = useMemo(
+    () => countCaseTypes(cases, { query, category, classification }),
+    [cases, query, category, classification],
   );
   // Detail hanya tampil bila kasus terpilih masih termasuk hasil filter.
   const selectedCase = filtered.find((c) => c.id === selectedId) ?? null;
@@ -70,6 +77,7 @@ export default function SopDirectory({ cases, holidays, completeYears, allowedCa
   function handleReset() {
     setQuery("");
     setCategory("all");
+    setCaseType("all");
     setClassification("all");
   }
 
@@ -152,7 +160,10 @@ export default function SopDirectory({ cases, holidays, completeYears, allowedCa
               key={meta.key}
               type="button"
               aria-pressed={active}
-              onClick={() => setCategory(active ? "all" : meta.key)}
+              onClick={() => {
+                setCategory(active ? "all" : meta.key);
+                setCaseType("all");
+              }}
               className={`flex items-center gap-3 rounded-lg border p-3.5 text-left shadow-sm transition-all hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0056B3] ${
                 active ? "border-[#0056B3] bg-[#d7e2ff]/40" : "border-[#c2c6d4]/40 bg-white"
               }`}
@@ -184,6 +195,10 @@ export default function SopDirectory({ cases, holidays, completeYears, allowedCa
         classification={classification}
         onChange={setClassification}
         counts={classificationCounts}
+        category={category}
+        caseType={caseType}
+        onCaseTypeChange={setCaseType}
+        caseTypeCounts={caseTypeCounts}
         shown={filtered.length}
         total={cases.length}
       />

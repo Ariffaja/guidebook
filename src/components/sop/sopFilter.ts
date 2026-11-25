@@ -1,4 +1,4 @@
-import type { SopCase, SopCategory, SopClassification } from "./sopTypes";
+import type { SopCase, SopCategory, SopClassification, SopCaseType } from "./sopTypes";
 import { sopClassifications, sopCaseTypeLabels } from "./sopTypes";
 
 /**
@@ -10,10 +10,13 @@ import { sopClassifications, sopCaseTypeLabels } from "./sopTypes";
 export type CategoryFilter = "all" | SopCategory;
 export type ClassificationFilter = "all" | SopClassification;
 
+export type CaseTypeFilter = "all" | SopCaseType;
+
 export type SopFilters = {
   query: string;
   category: CategoryFilter;
   classification: ClassificationFilter;
+  caseType?: CaseTypeFilter;
 };
 
 export function normalize(text: string): string {
@@ -45,6 +48,7 @@ export function filterCases(cases: SopCase[], filters: SopFilters): SopCase[] {
     (c) =>
       (filters.category === "all" || c.category === filters.category) &&
       (filters.classification === "all" || c.classification === filters.classification) &&
+      (filters.caseType === undefined || filters.caseType === "all" || c.caseType === filters.caseType) &&
       matchesQuery(c, tokens),
   );
 }
@@ -60,12 +64,31 @@ export function countByCategory(cases: SopCase[]): Record<SopCategory, number> {
 /** Jumlah per klasifikasi pada kategori dan kata kunci yang sedang aktif. */
 export function countClassifications(
   cases: SopCase[],
-  filters: Pick<SopFilters, "query" | "category">,
+  filters: Pick<SopFilters, "query" | "category" | "caseType">,
 ): Record<ClassificationFilter, number> {
   const base = filterCases(cases, { ...filters, classification: "all" });
   const counts = { all: base.length } as Record<ClassificationFilter, number>;
   sopClassifications.forEach(({ value }) => {
     counts[value] = base.filter((c) => c.classification === value).length;
+  });
+  return counts;
+}
+
+/** Jumlah per jenis kasus pada kategori, klasifikasi, dan pencarian yang aktif. */
+export function countCaseTypes(
+  cases: SopCase[],
+  filters: Pick<SopFilters, "query" | "category" | "classification">,
+): Record<CaseTypeFilter, number> {
+  const base = filterCases(cases, { ...filters, caseType: "all" });
+  const counts = {
+    all: base.length,
+    "pindah-datang": 0,
+    "pindah-keluar": 0,
+    kematian: 0,
+    kelahiran: 0,
+  } as Record<CaseTypeFilter, number>;
+  base.forEach((item) => {
+    if (item.caseType) counts[item.caseType] += 1;
   });
   return counts;
 }
