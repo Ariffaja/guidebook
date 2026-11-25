@@ -66,7 +66,7 @@ export default function SopCaseList({
         return (
           <li key={c.id}>
             <div
-              className={`relative overflow-hidden rounded-lg border shadow-sm transition-all hover:shadow-md ${
+              className={`relative overflow-hidden rounded-lg border shadow-sm transition-all hover:-translate-y-0.5 hover:scale-[1.01] hover:border-[#0056B3] hover:shadow-md ${
                 selected ? "border-[#0056B3] bg-[#f4f8ff]" : "border-[#c2c6d4]/40 bg-white"
               }`}
             >
@@ -75,7 +75,7 @@ export default function SopCaseList({
                 type="button"
                 onClick={() => onSelect(c.id)}
                 aria-current={selected ? "true" : undefined}
-                className="block w-full p-4 text-left focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-[#0056B3]"
+                className="block w-full cursor-pointer p-4 text-left focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-[#0056B3]"
               >
                 <span className="mb-2 flex flex-wrap items-center gap-2">
                   <CategoryBadge category={c.category} />
@@ -98,7 +98,7 @@ export default function SopCaseList({
                     <button
                       type="button"
                       onClick={() => onEdit(c)}
-                      className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#0056B3] hover:text-[#003F87] focus-visible:outline-2 focus-visible:outline-[#0056B3]"
+                      className="inline-flex cursor-pointer items-center gap-1.5 text-xs font-semibold text-[#0056B3] hover:text-[#003F87] focus-visible:outline-2 focus-visible:outline-[#0056B3]"
                     >
                       <Icon name="edit" className="text-[16px]" />
                       Edit
@@ -108,7 +108,7 @@ export default function SopCaseList({
                     <button
                       type="button"
                       onClick={() => onArchive(c)}
-                      className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#59616d] hover:text-[#191c1e] focus-visible:outline-2 focus-visible:outline-[#0056B3]"
+                      className="inline-flex cursor-pointer items-center gap-1.5 text-xs font-semibold text-[#59616d] hover:text-[#191c1e] focus-visible:outline-2 focus-visible:outline-[#0056B3]"
                     >
                       <Icon name="archive" className="text-[16px]" />
                       Arsipkan
@@ -118,7 +118,7 @@ export default function SopCaseList({
                     <button
                       type="button"
                       onClick={() => onRestore(c)}
-                      className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#0056B3] hover:text-[#003F87] focus-visible:outline-2 focus-visible:outline-[#0056B3]"
+                      className="inline-flex cursor-pointer items-center gap-1.5 text-xs font-semibold text-[#0056B3] hover:text-[#003F87] focus-visible:outline-2 focus-visible:outline-[#0056B3]"
                     >
                       <Icon name="unarchive" className="text-[16px]" />
                       Kembalikan

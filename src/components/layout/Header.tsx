@@ -3,8 +3,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import Icon from "@/components/ui/Icon";
+import Link from "next/link";
 import LogoutButton from "@/components/auth/LogoutButton";
-import ChangeOwnPasswordForm from "@/components/accounts/ChangeOwnPasswordForm";
 import MobileNav from "./MobileNav";
 
 type HeaderProps = {
@@ -19,7 +19,6 @@ type HeaderProps = {
 export default function Header({ pageLabel, user }: HeaderProps) {
   const [darkMode, setDarkMode] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
-  const [passwordFormOpen, setPasswordFormOpen] = useState(false);
   const profileMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -78,6 +77,13 @@ export default function Header({ pageLabel, user }: HeaderProps) {
     .map((part) => part.charAt(0))
     .join("")
     .toUpperCase();
+  const roleLabel = user?.role === "ADMIN"
+    ? "ADMIN"
+    : user?.role === "MENTOR"
+      ? "MENTOR"
+      : user?.role === "MAGANG"
+        ? "MAGANG"
+        : user?.role ?? "PENGGUNA";
 
   return (
     <header className="app-header fixed left-0 right-0 top-0 z-40 flex h-16 items-center justify-between border-b border-slate-200/80 bg-white/90 px-4 shadow-sm backdrop-blur-md sm:px-8 lg:left-[19rem]">
@@ -114,15 +120,6 @@ export default function Header({ pageLabel, user }: HeaderProps) {
           />
         </button>
 
-        <button
-          type="button"
-          title="Pengaturan"
-          aria-label="Pengaturan"
-          className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-800"
-        >
-          <Icon name="settings" className="text-[20px]" />
-        </button>
-
         {user && (
           <div ref={profileMenuRef} className="relative ml-1">
             <button
@@ -131,7 +128,7 @@ export default function Header({ pageLabel, user }: HeaderProps) {
               aria-expanded={profileOpen}
               aria-controls="profile-menu"
               onClick={() => setProfileOpen((open) => !open)}
-              className="flex h-9 w-9 items-center justify-center rounded-full bg-[#003F87] text-xs font-semibold text-white shadow-sm transition-colors hover:bg-[#0056B3] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0056B3]"
+              className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-[#003F87] text-xs font-semibold text-white shadow-sm transition-all hover:scale-105 hover:bg-[#0056B3] hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0056B3]"
             >
               {initials}
             </button>
@@ -139,33 +136,22 @@ export default function Header({ pageLabel, user }: HeaderProps) {
             {profileOpen && (
               <div
                 id="profile-menu"
-                className="absolute right-0 top-full z-50 mt-2 w-72 max-w-[calc(100vw-2rem)] rounded-xl border border-slate-200 bg-white p-4 shadow-lg"
+                className="absolute right-0 top-full z-50 mt-2 w-64 max-w-[calc(100vw-2rem)] overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg"
               >
-                <p className="mb-3 text-sm font-semibold text-slate-900">
-                  Profil pengguna
-                </p>
-                <dl className="space-y-3 text-sm">
-                  <div>
-                    <dt className="text-xs text-slate-500">Nama</dt>
-                    <dd className="truncate font-medium text-slate-800">
-                      {displayName}
-                    </dd>
+                <div className="flex items-center gap-3 px-4 py-3.5">
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#15558a] text-sm font-semibold text-white">{initials}</span>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex min-w-0 items-center gap-2">
+                      <span className="truncate text-sm font-semibold text-slate-900">{displayName}</span>
+                      <span className="shrink-0 rounded-full bg-[#e3f0ff] px-2 py-0.5 text-[10px] font-bold text-[#15558a]">{roleLabel}</span>
+                    </div>
+                    <span className="mt-0.5 block truncate text-xs text-slate-500">{user.email || "-"}</span>
                   </div>
-                  <div>
-                    <dt className="text-xs text-slate-500">Email</dt>
-                    <dd className="break-all font-medium text-slate-800">
-                      {user.email || "-"}
-                    </dd>
-                  </div>
-                  <div>
-                    <dt className="text-xs text-slate-500">Role</dt>
-                    <dd className="font-medium text-slate-800">{user.role}</dd>
-                  </div>
-                </dl>
-                <button type="button" onClick={() => setPasswordFormOpen((open) => !open)} className="mt-3 w-full rounded-lg border border-slate-200 px-3 py-2 text-left text-sm font-medium text-[#0056B3] hover:bg-blue-50">
-                  {passwordFormOpen ? "Tutup ubah sandi" : "Ubah sandi"}
-                </button>
-                {passwordFormOpen && <ChangeOwnPasswordForm />}
+                </div>
+                <Link href="/profile" onClick={() => setProfileOpen(false)} className="flex items-center gap-3 border-t border-slate-100 px-4 py-3 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50">
+                  <Icon name="person" className="text-[19px] text-slate-600" />
+                  <span>Lihat halaman profil</span>
+                </Link>
                 <LogoutButton />
               </div>
             )}

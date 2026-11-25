@@ -46,11 +46,6 @@ export default function BirthVerificationStep({
     }
   }
 
-  function handleContinueToSiak() {
-    // Placeholder: HTML sumber tidak mendefinisikan aksi untuk tombol ini.
-    setToast({ id: Date.now(), icon: "info", message: "Tahap Lanjutkan ke SIAK belum tersedia pada panduan ini." });
-  }
-
   return (
     <div className="mx-auto w-full max-w-[1080px] pb-8">
       <Breadcrumb
@@ -116,14 +111,6 @@ export default function BirthVerificationStep({
           <span>Pastikan seluruh berkas telah ditelaah dengan teliti sebelum finalisasi</span>
         </div>
 
-        <button
-          type="button"
-          onClick={handleContinueToSiak}
-          className="inline-flex items-center gap-2 rounded-lg bg-[#003F87] px-5 py-3 text-[12px] font-semibold text-white shadow-sm transition-colors hover:bg-[#0056B3] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0056B3]"
-        >
-          <span>Lanjutkan ke SIAK</span>
-          <Icon name="arrow_forward" className="text-[15px]" />
-        </button>
       </div>
 
       {toast && (

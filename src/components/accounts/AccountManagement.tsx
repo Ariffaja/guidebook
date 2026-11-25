@@ -8,6 +8,7 @@ import { toggleAccountStatus } from "@/app/account-management/actions";
 export type AccountRow = { id: number; name: string; email: string; role: string; isActive: boolean; sopDivisions: ("DAFDUK" | "CAPIL")[] };
 type RoleFilter = "all" | "ADMIN" | "MENTOR" | "MAGANG";
 type StatusFilter = "all" | "active" | "inactive";
+type PageSize = 5 | 10 | "all";
 
 const roleLabels: Record<string, string> = { ADMIN: "Admin", MENTOR: "Mentor", MAGANG: "Magang" };
 
@@ -15,10 +16,19 @@ export default function AccountManagement({ accounts, currentUserId, status }: {
   const [query, setQuery] = useState("");
   const [role, setRole] = useState<RoleFilter>("all");
   const [state, setState] = useState<StatusFilter>("all");
+  const [pageSize, setPageSize] = useState<PageSize>(5);
+  const [currentPage, setCurrentPage] = useState(1);
   const visibleAccounts = useMemo(() => accounts.filter((account) => {
     const matchesText = `${account.name} ${account.email}`.toLowerCase().includes(query.trim().toLowerCase());
     return matchesText && (role === "all" || account.role === role) && (state === "all" || (state === "active" ? account.isActive : !account.isActive));
   }), [accounts, query, role, state]);
+  const pageCount = pageSize === "all" ? 1 : Math.max(1, Math.ceil(visibleAccounts.length / pageSize));
+  const displayedPage = Math.min(currentPage, pageCount);
+  const paginatedAccounts = pageSize === "all"
+    ? visibleAccounts
+    : visibleAccounts.slice((displayedPage - 1) * pageSize, displayedPage * pageSize);
+  const firstAccount = visibleAccounts.length === 0 ? 0 : (displayedPage - 1) * (pageSize === "all" ? visibleAccounts.length : pageSize) + 1;
+  const lastAccount = pageSize === "all" ? visibleAccounts.length : Math.min(displayedPage * pageSize, visibleAccounts.length);
 
   const statusMessages: Record<string, string> = {
     created: "Akun berhasil dibuat.", updated: "Perubahan akun berhasil disimpan.",
@@ -41,17 +51,18 @@ export default function AccountManagement({ accounts, currentUserId, status }: {
       </div>
 
       <section className="rounded-xl border border-[#e0e3e5] bg-white p-4 shadow-sm sm:p-5">
-        <div className="grid gap-3 md:grid-cols-[1fr_180px_180px]">
-          <label className="relative block"><span className="sr-only">Cari akun</span><Icon name="search" className="absolute left-3 top-1/2 -translate-y-1/2 text-[20px] text-[#727784]" /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Cari nama atau email..." className="w-full rounded-lg border border-[#c2c6d4] py-2.5 pl-10 pr-3 text-sm outline-none focus:border-[#0056B3] focus:ring-2 focus:ring-[#0056B3]/15" /></label>
-          <label className="text-sm"><span className="sr-only">Filter role</span><select value={role} onChange={(event) => setRole(event.target.value as RoleFilter)} className="w-full rounded-lg border border-[#c2c6d4] px-3 py-2.5 text-sm"><option value="all">Semua role</option><option value="ADMIN">Admin</option><option value="MENTOR">Mentor</option><option value="MAGANG">Magang</option></select></label>
-          <label className="text-sm"><span className="sr-only">Filter status</span><select value={state} onChange={(event) => setState(event.target.value as StatusFilter)} className="w-full rounded-lg border border-[#c2c6d4] px-3 py-2.5 text-sm"><option value="all">Semua status</option><option value="active">Aktif</option><option value="inactive">Nonaktif</option></select></label>
+        <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_160px_160px_150px]">
+          <label className="relative block"><span className="sr-only">Cari akun</span><Icon name="search" className="absolute left-3 top-1/2 -translate-y-1/2 text-[20px] text-[#727784]" /><input value={query} onChange={(event) => { setQuery(event.target.value); setCurrentPage(1); }} placeholder="Cari nama atau email..." className="w-full rounded-lg border border-[#c2c6d4] py-2.5 pl-10 pr-3 text-sm outline-none focus:border-[#0056B3] focus:ring-2 focus:ring-[#0056B3]/15" /></label>
+          <label className="text-sm"><span className="sr-only">Filter role</span><select value={role} onChange={(event) => { setRole(event.target.value as RoleFilter); setCurrentPage(1); }} className="w-full rounded-lg border border-[#c2c6d4] px-3 py-2.5 text-sm"><option value="all">Semua role</option><option value="ADMIN">Admin</option><option value="MENTOR">Mentor</option><option value="MAGANG">Magang</option></select></label>
+          <label className="text-sm"><span className="sr-only">Filter status</span><select value={state} onChange={(event) => { setState(event.target.value as StatusFilter); setCurrentPage(1); }} className="w-full rounded-lg border border-[#c2c6d4] px-3 py-2.5 text-sm"><option value="all">Semua status</option><option value="active">Aktif</option><option value="inactive">Nonaktif</option></select></label>
+          <label className="text-sm"><span className="sr-only">Jumlah akun per halaman</span><select value={pageSize} onChange={(event) => { const value = event.target.value; setPageSize(value === "all" ? "all" : Number(value) as 5 | 10); setCurrentPage(1); }} className="w-full rounded-lg border border-[#c2c6d4] px-3 py-2.5 text-sm"><option value={5}>5 per halaman</option><option value={10}>10 per halaman</option><option value="all">Tampilkan semua</option></select></label>
         </div>
-        <p className="my-4 text-xs text-[#727784]">Menampilkan {visibleAccounts.length} dari {accounts.length} akun</p>
+        <p className="my-4 text-xs text-[#727784]">Menampilkan {firstAccount}–{lastAccount} dari {visibleAccounts.length} akun cocok ({accounts.length} total)</p>
         <div className="overflow-x-auto">
           <table className="w-full min-w-[720px] border-collapse text-left text-sm">
             <thead><tr className="border-y border-[#eceef0] text-xs uppercase tracking-wide text-[#727784]"><th className="px-3 py-3 font-semibold">Pengguna</th><th className="px-3 py-3 font-semibold">Role</th><th className="px-3 py-3 font-semibold">Status</th><th className="px-3 py-3 text-right font-semibold">Aksi</th></tr></thead>
             <tbody className="divide-y divide-[#eceef0]">
-              {visibleAccounts.map((account) => <tr key={account.id} className="hover:bg-[#f8f9fb]">
+              {paginatedAccounts.map((account) => <tr key={account.id} className="hover:bg-[#f8f9fb]">
                 <td className="px-3 py-3.5"><p className="font-semibold text-[#191c1e]">{account.name}{account.id === currentUserId && <span className="ml-2 text-xs font-normal text-[#727784]">(akunmu)</span>}</p><p className="mt-0.5 text-xs text-[#727784]">{account.email}</p></td>
                 <td className="px-3 py-3.5">
                   <span className="inline-flex max-w-full flex-wrap items-center rounded-md bg-[#edf2ff] px-2 py-1 text-xs font-semibold leading-5 text-[#234c9b]">
@@ -68,6 +79,14 @@ export default function AccountManagement({ accounts, currentUserId, status }: {
             </tbody>
           </table>
         </div>
+        {pageSize !== "all" && <nav aria-label="Navigasi halaman akun" className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-lg bg-white px-4 py-3 shadow-sm">
+          <p className="text-sm text-[#59616d]">Halaman {displayedPage} dari {pageCount}</p>
+          <div className="flex items-center gap-1.5">
+            <button type="button" onClick={() => setCurrentPage(Math.max(1, displayedPage - 1))} disabled={displayedPage === 1} aria-label="Halaman sebelumnya" title="Halaman sebelumnya" className="inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-md border border-[#c2c6d4] text-[#424752] transition-colors hover:bg-[#edf4ff] disabled:cursor-not-allowed disabled:opacity-45"><Icon name="chevron_left" className="text-[20px]" /></button>
+            {Array.from({ length: pageCount }, (_, index) => index + 1).map((page) => <button key={page} type="button" onClick={() => setCurrentPage(page)} aria-label={`Halaman ${page}`} aria-current={displayedPage === page ? "page" : undefined} className={`h-9 min-w-9 cursor-pointer rounded-md px-2 text-sm font-semibold transition-colors ${displayedPage === page ? "bg-[#0056B3] text-white" : "text-[#424752] hover:bg-[#edf4ff]"}`}>{page}</button>)}
+            <button type="button" onClick={() => setCurrentPage(Math.min(pageCount, displayedPage + 1))} disabled={displayedPage === pageCount} aria-label="Halaman berikutnya" title="Halaman berikutnya" className="inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-md border border-[#c2c6d4] text-[#424752] transition-colors hover:bg-[#edf4ff] disabled:cursor-not-allowed disabled:opacity-45"><Icon name="chevron_right" className="text-[20px]" /></button>
+          </div>
+        </nav>}
       </section>
     </div>
   );

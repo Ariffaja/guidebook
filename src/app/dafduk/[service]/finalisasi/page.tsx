@@ -9,7 +9,11 @@ export default async function FinalisasiPage({
   params: Promise<{ service: string }>;
 }) {
   const { service } = await params;
-  if (service !== "pindah-keluar") notFound();
+  if (service !== "pindah-keluar" && service !== "pindah-datang") notFound();
+
+  const isArrival = service === "pindah-datang";
+  const serviceTitle = isArrival ? "Pindah Datang" : "Pindah Keluar";
+  const backHref = isArrival ? "/dafduk/pindah-datang" : "/dafduk/pindah-keluar/klasifikasi/dalam-desa-kelurahan";
 
   return (
     <AppLayout pageLabel="Pendaftaran Kependudukan">
@@ -17,7 +21,7 @@ export default async function FinalisasiPage({
         <Breadcrumb
           items={[
             { label: "Pendaftaran Kependudukan" },
-            { label: "Pindah Keluar" },
+            { label: serviceTitle },
             { label: "Finalisasi SIAK" },
           ]}
         />
@@ -35,7 +39,7 @@ export default async function FinalisasiPage({
             Tahap finalisasi SIAK Terpusat belum tersedia.
           </p>
           <Link
-            href="/dafduk/pindah-keluar/klasifikasi/dalam-desa-kelurahan"
+            href={backHref}
             className="mt-8 inline-flex items-center gap-2 rounded-lg bg-[#003F87] px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#0056B3]"
           >
             <span aria-hidden="true">←</span> Kembali ke Verifikasi Berkas
