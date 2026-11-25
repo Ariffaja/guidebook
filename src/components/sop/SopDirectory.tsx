@@ -2,7 +2,7 @@
 
 import { useCallback, useMemo, useRef, useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
-import { archiveSopCase, restoreSopCase } from "@/app/sop-management/actions";
+import { archiveSopCase, deleteArchivedSopCase, restoreSopCase } from "@/app/sop-management/actions";
 import Icon from "@/components/ui/Icon";
 import Toast from "@/components/ui/Toast";
 import SopCaseDetail from "./SopCaseDetail";
@@ -22,6 +22,7 @@ import { sopCategories, type SopCase, type SopCategory } from "./sopTypes";
 import { renderSopTemplate } from "./sopDeadline";
 
 type ToastState = { id: number; icon: string; message: ReactNode };
+type ArchiveAction = "archive" | "restore" | "delete";
 
 /** Lebar layar (px) mulai dari mana daftar dan detail tampil berdampingan (breakpoint xl). */
 const SPLIT_LAYOUT_MIN_WIDTH = 1280;
@@ -35,7 +36,7 @@ export default function SopDirectory({ cases, holidays, completeYears, allowedCa
   const [classification, setClassification] = useState<ClassificationFilter>("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [archiveTarget, setArchiveTarget] = useState<SopCase | null>(null);
+  const [archiveTarget, setArchiveTarget] = useState<{ sopCase: SopCase; action: ArchiveAction } | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [toast, setToast] = useState<ToastState | null>(null);
   const closeToast = useCallback(() => setToast(null), []);
@@ -69,6 +70,7 @@ export default function SopDirectory({ cases, holidays, completeYears, allowedCa
     updated: "Perubahan kasus berhasil disimpan.",
     archived: "SOP berhasil diarsipkan.",
     restored: "SOP berhasil dikembalikan ke daftar aktif.",
+    deleted: "SOP dihapus permanen.",
     error: "Aksi gagal dilakukan. Muat ulang halaman lalu coba lagi.",
   };
   const statusMessage = statusMessages[status ?? ""];
@@ -223,8 +225,9 @@ export default function SopDirectory({ cases, holidays, completeYears, allowedCa
             onSelect={handleSelect}
             onReset={handleReset}
             onEdit={canManage && !showArchived ? (item) => router.push("/sop-management/" + encodeURIComponent(item.id) + "/edit") : undefined}
-            onArchive={canManage && !showArchived ? setArchiveTarget : undefined}
-            onRestore={canManage && showArchived ? setArchiveTarget : undefined}
+            onArchive={canManage && !showArchived ? (item) => setArchiveTarget({ sopCase: item, action: "archive" }) : undefined}
+            onRestore={canManage && showArchived ? (item) => setArchiveTarget({ sopCase: item, action: "restore" }) : undefined}
+            onDelete={canManage && showArchived ? (item) => setArchiveTarget({ sopCase: item, action: "delete" }) : undefined}
           />
           {filtered.length > CASES_PER_PAGE && (
             <nav aria-label="Navigasi halaman daftar SOP" className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-lg bg-white px-4 py-3 shadow-sm">
@@ -254,6 +257,7 @@ export default function SopDirectory({ cases, holidays, completeYears, allowedCa
             copied={selectedCase?.id === copiedId}
             holidays={holidays}
             completeYears={completeYears}
+            canViewHistory={canManage}
           />
         </div>
       </div>
@@ -262,13 +266,13 @@ export default function SopDirectory({ cases, holidays, completeYears, allowedCa
         <div className="fixed inset-0 z-[80] flex items-center justify-center bg-slate-950/40 p-4" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setArchiveTarget(null); }}>
           <section role="dialog" aria-modal="true" aria-labelledby="archive-case-title" className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl">
             <div className="flex items-start gap-3">
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#edf4ff] text-[#0056B3]"><Icon name={showArchived ? "unarchive" : "archive"} className="text-[20px]" /></span>
-              <div><h2 id="archive-case-title" className="text-lg font-semibold text-[#191c1e]">{showArchived ? "Kembalikan SOP ini?" : "Arsipkan SOP ini?"}</h2><p className="mt-2 text-sm leading-relaxed text-[#424752]">“{archiveTarget.title}” {showArchived ? "akan dikembalikan ke daftar SOP aktif." : "akan dipindahkan ke arsip dan tidak tampil untuk pengguna Magang."}</p></div>
+              <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${archiveTarget.action === "delete" ? "bg-red-50 text-red-700" : "bg-[#edf4ff] text-[#0056B3]"}`}><Icon name={archiveTarget.action === "delete" ? "delete" : archiveTarget.action === "restore" ? "unarchive" : "archive"} className="text-[20px]" /></span>
+              <div><h2 id="archive-case-title" className="text-lg font-semibold text-[#191c1e]">{archiveTarget.action === "delete" ? "Hapus SOP ini?" : archiveTarget.action === "restore" ? "Kembalikan SOP ini?" : "Arsipkan SOP ini?"}</h2><p className="mt-2 text-sm leading-relaxed text-[#424752]">{archiveTarget.action === "delete" ? <>SOP “{archiveTarget.sopCase.title}” beserta templatnya akan dihapus permanen. Data yang dihapus tidak dapat dipulihkan. Yakin ingin melanjutkan?</> : <>“{archiveTarget.sopCase.title}” {archiveTarget.action === "restore" ? "akan dikembalikan ke daftar SOP aktif." : "akan dipindahkan ke arsip dan tidak tampil untuk pengguna Magang."}</>}</p></div>
             </div>
-            <form action={showArchived ? restoreSopCase : archiveSopCase} className="mt-6 flex justify-end gap-2">
-              <input type="hidden" name="id" value={archiveTarget.id} />
+            <form action={archiveTarget.action === "delete" ? deleteArchivedSopCase : archiveTarget.action === "restore" ? restoreSopCase : archiveSopCase} className="mt-6 flex justify-end gap-2">
+              <input type="hidden" name="id" value={archiveTarget.sopCase.id} />
               <button type="button" onClick={() => setArchiveTarget(null)} className="rounded-lg border border-[#c2c6d4] px-4 py-2 text-sm font-medium text-[#424752] hover:bg-[#f2f4f6]">Batal</button>
-              <button type="submit" className="rounded-lg bg-[#0056B3] px-4 py-2 text-sm font-semibold text-white hover:bg-[#003F87]">{showArchived ? "Kembalikan" : "Arsipkan"}</button>
+              <button type="submit" className={`rounded-lg px-4 py-2 text-sm font-semibold text-white ${archiveTarget.action === "delete" ? "bg-red-700 hover:bg-red-800" : "bg-[#0056B3] hover:bg-[#003F87]"}`}>{archiveTarget.action === "delete" ? "Hapus" : archiveTarget.action === "restore" ? "Kembalikan" : "Arsipkan"}</button>
             </form>
           </section>
         </div>

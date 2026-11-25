@@ -61,9 +61,10 @@ Skema Prisma berada di `prisma/schema.prisma`; konfigurasi koneksi Prisma ada di
 - Pengguna yang berhak dapat mencari kasus dan memfilter berdasarkan Dafduk/Capil, jenis kasus, dan klasifikasi BTL/TDP. Daftar dan panel detail menampilkan deskripsi serta templat. Templat bisa disalin; tanggal tenggat dinamis dihitung saat ditampilkan/disalin.
 - Token tenggat adalah `{{TANGGAL_TENGGAT}}`. Tenggat hanya untuk BTL dan durasinya 1–30 hari kerja. Perhitungan mengikuti tanggal Asia/Jakarta, melewati Sabtu, Minggu, dan hari libur nasional. Cuti bersama tetap dihitung sebagai hari kerja.
 - Jika kalender untuk salah satu tahun yang diperlukan belum ditandai lengkap, aplikasi menampilkan pemberitahuan bahwa kalender belum tersedia, bukan menebak tanggal.
-- Admin dan mentor yang mendapat divisi dapat menambah, mengubah, serta mengarsipkan/memulihkan kasus pada divisi yang diizinkan. Pengguna Magang hanya melihat kasus aktif sesuai aksesnya. Arsip disembunyikan dari pengguna Magang.
+- Admin dan mentor yang mendapat divisi dapat menambah, mengubah, serta mengarsipkan/memulihkan kasus pada divisi yang diizinkan. Dari tampilan arsip, pengelola juga dapat menghapus permanen SOP yang sudah diarsipkan setelah konfirmasi; tindakan ini tidak dapat dipulihkan. Pengguna Magang hanya melihat kasus aktif sesuai aksesnya. Arsip disembunyikan dari pengguna Magang.
+- Tombol Riwayat SOP pada panel detail membuka riwayat SOP yang sedang dipilih. Admin dan mentor sesuai divisi dapat melihat pelaku, waktu WIB, serta nilai sebelum/sesudah untuk setiap perubahan. Catatan audit tetap tersimpan setelah SOP dihapus.
 - Kalender hari libur tersimpan di `HolidayCalendar` dan `NationalHoliday`. Tidak ada UI untuk mengelola kalender; kalender harus dipelihara dari SKB resmi melalui perubahan database/migrasi terkontrol, termasuk tahun baru.
-- Rute utama: `/sop-directory`; `/sop-management` mengarahkan kembali ke direktori. Form tambah/edit ada di `/sop-management/new` dan `/sop-management/[id]/edit`.
+- Rute utama: `/sop-directory`; `/sop-directory/[id]/history` menampilkan riwayat satu SOP; `/sop-management` mengarahkan kembali ke direktori. Form tambah/edit ada di `/sop-management/new` dan `/sop-management/[id]/edit`.
 
 ### Manajemen akun
 
@@ -93,6 +94,8 @@ Hanya `ADMIN` yang dapat membuka `/account-management` dan menjalankan aksi akun
 | MAGANG | Halaman panduan yang dapat dibuka pengguna login | Semua SOP aktif | Tidak | Tidak |
 
 Izin SOP berasal dari `getSopAccess` di `src/lib/sopAccess.ts`. Perubahan izin harus diperiksa pada halaman dan server action sekaligus. Sesi JWT membaca kembali data akun/role aktif pada callback JWT di `auth.ts`.
+
+Riwayat SOP diatur server-side dengan izin yang sama seperti pengelolaan SOP. Log per SOP disimpan di model `SopAuditLog`; log menyimpan snapshot pelaku agar nama/email tetap dapat dikenali jika akun kelak dihapus, dan tidak memiliki foreign key ke `SopCase` agar catatan penghapusan tidak ikut hilang.
 
 ## 5. Peta direktori dan berkas
 
@@ -140,12 +143,13 @@ Izin SOP berasal dari `getSopAccess` di `src/lib/sopAccess.ts`. Perubahan izin h
 
 - `src/lib/prisma.ts` — Prisma Client bersama.
 - `src/lib/sopCases.ts` — baca kasus, impor data awal lama sekali, pemetaan record.
+- `src/lib/sopAudit.ts` — pembuatan log audit dan perbandingan nilai SOP lama/baru.
 - `src/lib/sopAccess.ts` — hak akses SOP mentor/admin/magang dan pemetaan divisi.
 - `src/lib/holidayCalendar.ts` — mengambil data hari libur dan tahun kalender lengkap.
 - `src/lib/internImport.ts` — parsing, validasi, dan pratinjau workbook impor.
 - `src/components/sop/sopDeadline.ts` — tanggal hari kerja dan penggantian token templat.
 - `src/types/next-auth.d.ts` — perluasan tipe session/JWT.
-- `prisma/schema.prisma` — model Role, User, UserSopDivision, SopCase, SopDataMigration, HolidayCalendar, NationalHoliday.
+- `prisma/schema.prisma` — model Role, User, UserSopDivision, SopCase, SopAuditLog, SopDataMigration, HolidayCalendar, NationalHoliday.
 - `prisma/migrations/` — migrasi SQL versi database; jangan mengedit migrasi lama yang telah digunakan di lingkungan bersama.
 - `prisma/seed.js` — menyiapkan tiga role awal.
 - `prisma/create-admin.js` — membuat akun admin interaktif.
@@ -181,7 +185,7 @@ Perintah yang tersedia untuk pemeriksaan manual: `npm run lint` dan `npm run bui
 - Kalender libur tidak memiliki UI; pemeliharaan tiap tahun harus dilakukan terencana dari sumber resmi.
 - Kalender yang belum lengkap menyebabkan token tenggat menampilkan pesan ketersediaan kalender.
 - Tidak ada audit log untuk perubahan akun/SOP dan tidak ada undangan atau reset sandi melalui email.
-- Manajemen akun tidak menghapus akun permanen. SOP menggunakan arsip yang dapat dipulihkan.
+- Manajemen akun tidak menghapus akun permanen. SOP yang sudah diarsipkan dapat dipulihkan atau dihapus permanen oleh pengelola dengan izin pada divisinya.
 - Dokumen sprint `docs/sop-management-sprint.md` dan `docs/account-management-sprint.md` adalah catatan checkpoint historis; status di tabelnya mungkin tertinggal dari fitur saat ini. Gunakan kode dan panduan ini untuk kondisi implementasi terbaru.
 - Pastikan `DATABASE_URL` menunjuk database yang benar sebelum menjalankan migrasi, seed, atau skrip admin.
 

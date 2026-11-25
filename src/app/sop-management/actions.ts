@@ -7,6 +7,7 @@ import { auth } from "../../../auth";
 import { prisma } from "@/lib/prisma";
 import { getSopCases } from "@/lib/sopCases";
 import { getSopAccess } from "@/lib/sopAccess";
+import { createSopAuditLog, getSopAuditChanges, type SopAuditActor } from "@/lib/sopAudit";
 import { SOP_DEADLINE_TOKEN } from "@/components/sop/sopDeadline";
 
 export type SopFormState = { error?: string };
@@ -21,7 +22,14 @@ async function requireSopManager() {
   if (!session?.user || !session.user.isActive) redirect("/login");
   const access = await getSopAccess(Number(session.user.id));
   if (!access?.canManage) redirect("/");
-  return access;
+  return {
+    ...access,
+    actor: {
+      userId: Number(session.user.id),
+      name: session.user.name?.trim() || "Pengguna",
+      email: session.user.email ?? "",
+    } satisfies SopAuditActor,
+  };
 }
 
 function readForm(formData: FormData) {
@@ -86,8 +94,19 @@ export async function createSopCase(_previous: SopFormState, formData: FormData)
   await getSopCases();
   const lastPosition = await prisma.sopCase.aggregate({ _max: { sortOrder: true } });
 
-  await prisma.sopCase.create({
-    data: { id: randomUUID(), sortOrder: (lastPosition._max.sortOrder ?? -1) + 1, ...parsed.data },
+  const id = randomUUID();
+  await prisma.$transaction(async (tx) => {
+    await tx.sopCase.create({
+      data: { id, sortOrder: (lastPosition._max.sortOrder ?? -1) + 1, ...parsed.data },
+    });
+    await createSopAuditLog(tx, {
+      sopCaseId: id,
+      sopTitle: parsed.data.title,
+      category: parsed.data.category,
+      action: "CREATE",
+      actor: access.actor,
+      details: { changes: getSopAuditChanges(null, parsed.data as Record<string, unknown>) },
+    });
   });
   revalidatePath("/sop-directory");
   revalidatePath("/sop-management");
@@ -106,11 +125,21 @@ export async function updateSopCase(
   await getSopCases();
 
   try {
-    const existing = await prisma.sopCase.findUnique({ where: { id }, select: { category: true, isArchived: true } });
-    if (!existing || existing.isArchived || !access.categories.includes(existing.category as "dafduk" | "capil")) {
-      return { error: "Kasus tidak ditemukan atau kamu tidak memiliki akses untuk mengubahnya." };
-    }
-    await prisma.sopCase.update({ where: { id }, data: parsed.data });
+    const updated = await prisma.$transaction(async (tx) => {
+      const existing = await tx.sopCase.findUnique({ where: { id } });
+      if (!existing || existing.isArchived || !access.categories.includes(existing.category as "dafduk" | "capil")) return null;
+      const updatedCase = await tx.sopCase.update({ where: { id }, data: parsed.data });
+      await createSopAuditLog(tx, {
+        sopCaseId: id,
+        sopTitle: updatedCase.title,
+        category: updatedCase.category,
+        action: "UPDATE",
+        actor: access.actor,
+        details: { changes: getSopAuditChanges(existing as unknown as Record<string, unknown>, updatedCase as unknown as Record<string, unknown>) },
+      });
+      return updatedCase;
+    });
+    if (!updated) return { error: "Kasus tidak ditemukan atau kamu tidak memiliki akses untuk mengubahnya." };
   } catch {
     return { error: "Kasus tidak ditemukan atau gagal diperbarui. Muat ulang halaman lalu coba lagi." };
   }
@@ -126,25 +155,32 @@ async function setSopCaseArchived(formData: FormData, isArchived: boolean): Prom
   if (!id) redirect("/sop-directory?status=error");
   await getSopCases(access.categories, isArchived);
 
-  let existing: { category: string; isArchived: boolean } | null;
+  let changed = false;
   try {
-    existing = await prisma.sopCase.findUnique({ where: { id }, select: { category: true, isArchived: true } });
+    changed = await prisma.$transaction(async (tx) => {
+      const existing = await tx.sopCase.findUnique({ where: { id } });
+      if (
+        !existing ||
+        !access.categories.includes(existing.category as "dafduk" | "capil") ||
+        existing.isArchived === isArchived
+      ) return false;
+      const updatedCase = await tx.sopCase.update({ where: { id }, data: { isArchived } });
+      await createSopAuditLog(tx, {
+        sopCaseId: id,
+        sopTitle: existing.title,
+        category: existing.category,
+        action: isArchived ? "ARCHIVE" : "RESTORE",
+        actor: access.actor,
+        details: {
+          changes: [{ field: "isArchived", oldValue: existing.isArchived, newValue: updatedCase.isArchived }],
+        },
+      });
+      return true;
+    });
   } catch {
     redirect("/sop-directory?status=error");
   }
-  if (
-    !existing ||
-    !access.categories.includes(existing.category as "dafduk" | "capil") ||
-    existing.isArchived === isArchived
-  ) {
-    redirect("/sop-directory?status=error");
-  }
-
-  try {
-    await prisma.sopCase.update({ where: { id }, data: { isArchived } });
-  } catch {
-    redirect("/sop-directory?status=error");
-  }
+  if (!changed) redirect("/sop-directory?status=error");
 
   revalidatePath("/sop-directory");
   revalidatePath("/sop-management");
@@ -157,5 +193,41 @@ export async function archiveSopCase(formData: FormData): Promise<void> {
 
 export async function restoreSopCase(formData: FormData): Promise<void> {
   await setSopCaseArchived(formData, false);
+}
+
+export async function deleteArchivedSopCase(formData: FormData): Promise<void> {
+  const access = await requireSopManager();
+  const id = String(formData.get("id") ?? "");
+  if (!id) redirect("/sop-directory?view=archive&status=error");
+
+  try {
+    const deleted = await prisma.$transaction(async (tx) => {
+      const existing = await tx.sopCase.findUnique({ where: { id } });
+      if (
+        !existing ||
+        !existing.isArchived ||
+        !access.categories.includes(existing.category as "dafduk" | "capil")
+      ) return false;
+      await createSopAuditLog(tx, {
+        sopCaseId: id,
+        sopTitle: existing.title,
+        category: existing.category,
+        action: "DELETE",
+        actor: access.actor,
+        details: {
+          changes: getSopAuditChanges(existing as unknown as Record<string, unknown>, null),
+        },
+      });
+      await tx.sopCase.delete({ where: { id } });
+      return true;
+    });
+    if (!deleted) redirect("/sop-directory?view=archive&status=error");
+  } catch {
+    redirect("/sop-directory?view=archive&status=error");
+  }
+
+  revalidatePath("/sop-directory");
+  revalidatePath("/sop-management");
+  redirect(`/sop-directory/${encodeURIComponent(id)}/history?deleted=1`);
 }
 

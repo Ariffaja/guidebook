@@ -28,6 +28,7 @@ type SopCaseListProps = {
   onEdit?: (sopCase: SopCase) => void;
   onArchive?: (sopCase: SopCase) => void;
   onRestore?: (sopCase: SopCase) => void;
+  onDelete?: (sopCase: SopCase) => void;
 };
 
 export default function SopCaseList({
@@ -39,6 +40,7 @@ export default function SopCaseList({
   onEdit,
   onArchive,
   onRestore,
+  onDelete,
 }: SopCaseListProps) {
   if (cases.length === 0) {
     return (
@@ -92,7 +94,7 @@ export default function SopCaseList({
                   </span>
                 )}
               </button>
-              {(onEdit || onArchive || onRestore) && (
+              {(onEdit || onArchive || onRestore || onDelete) && (
                 <div className="flex justify-end gap-3 border-t border-[#eceef0] px-4 py-2.5">
                   {onEdit && (
                     <button
@@ -122,6 +124,16 @@ export default function SopCaseList({
                     >
                       <Icon name="unarchive" className="text-[16px]" />
                       Kembalikan
+                    </button>
+                  )}
+                  {onDelete && (
+                    <button
+                      type="button"
+                      onClick={() => onDelete(c)}
+                      className="inline-flex cursor-pointer items-center gap-1.5 text-xs font-semibold text-red-700 hover:text-red-900 focus-visible:outline-2 focus-visible:outline-[#b42318]"
+                    >
+                      <Icon name="delete" className="text-[16px]" />
+                      Hapus
                     </button>
                   )}
                 </div>

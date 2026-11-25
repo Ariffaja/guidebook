@@ -32,8 +32,17 @@ model User {
   isActive  Boolean  @default(true)
   role      Role     @relation(fields: [roleId], references: [id])
   sopDivisions UserSopDivision[]
+  sopAuditLogs SopAuditLog[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+enum SopAuditAction {
+  CREATE
+  UPDATE
+  ARCHIVE
+  RESTORE
+  DELETE
 }
 
 enum SopDivision {
@@ -68,6 +77,24 @@ model SopCase {
 
   @@index([category])
   @@index([classification])
+}
+
+model SopAuditLog {
+  id          String         @id @db.VarChar(64)
+  sopCaseId   String         @db.VarChar(64)
+  sopTitle    String         @db.VarChar(255)
+  category    String         @db.VarChar(16)
+  action      SopAuditAction
+  actorUserId Int?
+  actorName   String         @db.VarChar(100)
+  actorEmail  String         @db.VarChar(191)
+  details     Json
+  createdAt   DateTime       @default(now())
+  actor       User?          @relation(fields: [actorUserId], references: [id], onDelete: SetNull)
+
+  @@index([sopCaseId, createdAt])
+  @@index([category, createdAt])
+  @@index([actorUserId])
 }
 
 model SopDataMigration {

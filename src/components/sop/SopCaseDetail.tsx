@@ -1,3 +1,4 @@
+import Link from "next/link";
 import Icon from "@/components/ui/Icon";
 import { CaseTypeBadge, ClassificationBadge, CategoryBadge } from "./SopBadges";
 import type { SopCase } from "./sopTypes";
@@ -12,10 +13,11 @@ type SopCaseDetailProps = {
   copied: boolean;
   holidays: string[];
   completeYears: number[];
+  canViewHistory: boolean;
 };
 
 /** Panel detail: judul, deskripsi (jika ada), templat asli, dan tombol salin pesan. */
-export default function SopCaseDetail({ sopCase, onCopy, copied, holidays, completeYears }: SopCaseDetailProps) {
+export default function SopCaseDetail({ sopCase, onCopy, copied, holidays, completeYears, canViewHistory }: SopCaseDetailProps) {
   if (!sopCase) {
     return (
       <div className="flex flex-col items-center gap-3 rounded-lg bg-white p-10 text-center shadow-sm">
@@ -60,15 +62,28 @@ export default function SopCaseDetail({ sopCase, onCopy, copied, holidays, compl
             <Icon name="chat" className="text-[16px] text-[#003F87]" />
             Templat Respons Operator
           </h3>
-          <button
-            type="button"
-            disabled={!renderedTemplate}
-            onClick={() => onCopy(sopCase)}
-            className="inline-flex shrink-0 items-center gap-1 text-[10px] font-medium text-[#0056B3] transition-colors hover:text-[#003F87] disabled:cursor-not-allowed disabled:text-[#9aa3ad]"
-          >
-            <Icon name={copied ? "check" : "content_copy"} className="text-[13px]" />
-            {copied ? "Tersalin" : "Salin Pesan"}
-          </button>
+          <div className="flex shrink-0 items-center gap-3">
+            {canViewHistory && (
+              <Link
+                href={`/sop-directory/${encodeURIComponent(sopCase.id)}/history`}
+                title="Lihat riwayat perubahan SOP ini"
+                className="inline-flex min-h-9 items-center gap-1.5 rounded-md border border-[#9bb8dc] bg-[#edf4ff] px-2.5 text-xs font-semibold text-[#0056B3] shadow-sm transition-colors hover:border-[#0056B3] hover:bg-[#d7e7ff] hover:text-[#003F87] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0056B3] active:scale-[0.98]"
+              >
+                <Icon name="history" className="text-[16px]" />
+                Riwayat SOP
+              </Link>
+            )}
+            <button
+              type="button"
+              disabled={!renderedTemplate}
+              onClick={() => onCopy(sopCase)}
+              title="Salin templat respons"
+              className={`inline-flex min-h-9 items-center gap-1.5 rounded-md border px-2.5 text-xs font-semibold shadow-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0056B3] active:scale-[0.98] disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-slate-100 disabled:text-slate-400 disabled:shadow-none ${copied ? "border-emerald-700 bg-emerald-700 text-white hover:bg-emerald-800" : "border-[#0056B3] bg-[#0056B3] text-white hover:border-[#003F87] hover:bg-[#003F87]"}`}
+            >
+              <Icon name={copied ? "check" : "content_copy"} className="text-[16px]" />
+              {copied ? "Tersalin" : "Salin Pesan"}
+            </button>
+          </div>
         </div>
         {renderedTemplate ? (
           <div className="select-all whitespace-pre-wrap rounded bg-[#f2f4f6] p-4 text-[13px] leading-relaxed text-[#191c1e]">
