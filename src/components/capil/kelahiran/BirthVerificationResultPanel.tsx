@@ -1,5 +1,5 @@
 import Icon from "@/components/ui/Icon";
-import type { DocumentSelection, VerificationDocument } from "./birthVerificationData";
+import type { VerificationDocument } from "./birthVerificationData";
 import {
   TOTAL_DOCUMENTS,
   buildDirective,
@@ -26,7 +26,7 @@ const statusConfig: Record<OverallStatus, StatusConfig> = {
     iconClass: "text-[#59616d]",
     headline: "Menunggu Kelengkapan Berkas",
     headlineClass: "font-semibold text-[#191c1e]",
-    desc: "Pilih kondisi data dan lampiran untuk melihat hasil pemeriksaan berkas.",
+    desc: "Pilih kondisi lampiran fisik untuk melihat hasil pemeriksaan berkas.",
   },
   siap: {
     box: "bg-[#86e8e2] text-[#004f4f]",
@@ -44,7 +44,7 @@ const statusConfig: Record<OverallStatus, StatusConfig> = {
     iconClass: "text-[#9a3f0b]",
     headline: "BERKAS TIDAK LENGKAP (BTL)",
     headlineClass: "font-bold text-[#722b00]",
-    desc: "Beberapa dokumen memerlukan perbaikan foto atau penyesuaian penulisan teks sebelum dapat dimasukkan ke SIAK.",
+    desc: "Beberapa lampiran fisik perlu diperbaiki karena buram, terpotong, atau belum terbaca jelas.",
   },
   tdp: {
     box: "bg-[#ffdad6] text-[#93000a]",
@@ -53,7 +53,7 @@ const statusConfig: Record<OverallStatus, StatusConfig> = {
     iconClass: "text-[#ba1a1a]",
     headline: "TIDAK DAPAT DIPROSES (TDP)",
     headlineClass: "font-bold text-[#ba1a1a]",
-    desc: "Ditemukan dokumen dengan data esensial kosong atau dokumen yang salah unggah.",
+    desc: "Ditemukan lampiran fisik yang salah unggah, rusak, atau tidak valid.",
   },
 };
 
@@ -68,7 +68,6 @@ const sectionLabel = "text-[9px] font-bold uppercase tracking-[1.3px] text-[#657
 
 type BirthVerificationResultPanelProps = {
   documents: VerificationDocument[];
-  selections: DocumentSelection[];
   evaluation: Evaluation;
   onCopy: (text: string) => void;
 };
@@ -76,7 +75,6 @@ type BirthVerificationResultPanelProps = {
 /** Ringkasan status, lampiran, dan template arahan operator. */
 export default function BirthVerificationResultPanel({
   documents,
-  selections,
   evaluation,
   onCopy,
 }: BirthVerificationResultPanelProps) {
@@ -113,11 +111,7 @@ export default function BirthVerificationResultPanel({
           {documents.map((doc, index) => {
             const result = evaluation.results[index];
             const item = checklistConfig[result];
-            const selection = selections[index];
-            const value =
-              result === "pending" && (selection.input !== "" || selection.image !== "")
-                ? "Belum lengkap"
-                : item.label;
+            const value = item.label;
             return (
               <div
                 key={doc.id}

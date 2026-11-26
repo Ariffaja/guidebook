@@ -3,7 +3,6 @@ import type {
   ConditionOption,
   DocumentSelection,
   ImageCondition,
-  InputCondition,
   VerificationDocument,
 } from "./birthVerificationData";
 import type { DocumentResult } from "./birthVerificationLogic";
@@ -67,7 +66,7 @@ type BirthVerificationCardProps = {
   onChange: (next: DocumentSelection) => void;
 };
 
-/** Satu dokumen dengan dua kelompok radio: data PLAVON dan lampiran fisik. */
+/** Satu dokumen dengan tiga pilihan kondisi lampiran fisik. */
 export default function BirthVerificationCard({
   document: doc,
   selection,
@@ -92,22 +91,13 @@ export default function BirthVerificationCard({
         </span>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <ConditionRadioGroup<InputCondition>
-          id={`input-cond-${doc.id}`}
-          label="Data teks PLAVON"
-          value={selection.input}
-          options={doc.inputOptions}
-          onChange={(input) => onChange({ ...selection, input })}
-        />
-        <ConditionRadioGroup<ImageCondition>
-          id={`image-cond-${doc.id}`}
-          label="Lampiran fisik"
-          value={selection.image}
-          options={doc.imageOptions}
-          onChange={(image) => onChange({ ...selection, image })}
-        />
-      </div>
+      <ConditionRadioGroup<ImageCondition>
+        id={`image-cond-${doc.id}`}
+        label="Lampiran fisik"
+        value={selection.image}
+        options={doc.imageOptions}
+        onChange={(image) => onChange({ image })}
+      />
     </section>
   );
 }

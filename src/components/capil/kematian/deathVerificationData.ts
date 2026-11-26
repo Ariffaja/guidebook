@@ -1,11 +1,4 @@
-/**
- * Data Verifikasi Berkas Kematian (KTP-el).
- * Dokumen, urutan, ikon, dan pilihan dropdown disalin dari HTML Stitch kematian.
- */
-
-/** Pemeriksaan [INPUT] Data Teks PLAVON. */
-export type DeathInputCondition = "sesuai" | "tidak_sesuai" | "tidak_lengkap";
-/** Pemeriksaan [GAMBAR] Lampiran Fisik. */
+/** Data pemeriksaan lampiran fisik untuk alur pencatatan kematian. */
 export type DeathImageCondition = "jelas" | "buram" | "salah_unggah";
 
 export type ConditionOption<T extends string> = { value: T; label: string };
@@ -19,19 +12,12 @@ export type DeathVerificationDocument = {
   checklistLabel: string;
 };
 
-/** Pilihan operator untuk satu dokumen. Nilai "" berarti belum diisi. */
+/** Satu pilihan lampiran fisik per dokumen. Nilai "" berarti belum diperiksa. */
 export type DeathDocumentSelection = {
-  input: DeathInputCondition | "";
   image: DeathImageCondition | "";
 };
 
-/** Pilihan dropdown sama untuk keenam dokumen. */
-export const deathInputOptions: ConditionOption<DeathInputCondition>[] = [
-  { value: "sesuai", label: "Sesuai / Valid" },
-  { value: "tidak_sesuai", label: "Tidak Sesuai SIAK" },
-  { value: "tidak_lengkap", label: "Data Kurang Lengkap" },
-];
-
+/** Tiga pilihan pemeriksaan lampiran fisik untuk setiap dokumen. */
 export const deathImageOptions: ConditionOption<DeathImageCondition>[] = [
   { value: "jelas", label: "Jelas & Asli" },
   { value: "buram", label: "Buram / Tidak Terbaca" },

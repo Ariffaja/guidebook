@@ -17,7 +17,7 @@ type BirthVerificationStepProps = {
 type ToastState = { id: number; icon: string; message: ReactNode };
 
 const emptySelections = (): DocumentSelection[] =>
-  birthVerificationDocuments.map(() => ({ input: "", image: "" }));
+  birthVerificationDocuments.map(() => ({ image: "" }));
 
 /**
  * Simulasi panduan verifikasi berkas NIK Bayi Kecil untuk operator.
@@ -65,7 +65,7 @@ export default function BirthVerificationStep({
           Verifikasi Berkas Kelahiran
         </h1>
         <p className="mt-1 max-w-3xl text-[12px] text-[#424752]">
-          Periksa kesesuaian data dan lampiran pada setiap dokumen untuk menentukan status pemeriksaan
+          Periksa kondisi lampiran fisik pada setiap dokumen untuk menentukan status pemeriksaan
           secara valid sebelum sinkronisasi SIAK.
         </p>
         <span className="mt-2 inline-flex rounded-full bg-[#d7e2ff] px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[#001a40]">
@@ -89,7 +89,6 @@ export default function BirthVerificationStep({
         <aside className="lg:sticky lg:top-20">
           <BirthVerificationResultPanel
             documents={birthVerificationDocuments}
-            selections={selections}
             evaluation={evaluation}
             onCopy={handleCopy}
           />

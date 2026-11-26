@@ -1,8 +1,6 @@
 export type DeathCategoryKey =
   | "ktp-el-lama"
-  | "ktp-el-modern"
-  | "kepala-keluarga"
-  | "luar-negeri";
+  | "ktp-el-modern";
 
 export type DeathCategory = {
   key: DeathCategoryKey;
@@ -31,21 +29,5 @@ export const deathCategories: DeathCategory[] = [
     title: "KTP Lama",
     description:
       "Pencatatan jenazah dengan dokumen KTP elektronik model lama yang belum terintegrasi chip mutakhir.",
-  },
-  {
-    key: "kepala-keluarga",
-    icon: "family_restroom",
-    badge: "Kartu Keluarga",
-    title: "Jenazah Berstatus Kepala Keluarga",
-    description:
-      "Alur khusus penerbitan akta kematian yang disertai otomatisasi pergantian Kepala Keluarga pada KK.",
-  },
-  {
-    key: "luar-negeri",
-    icon: "flight_takeoff",
-    badge: "Luar Negeri",
-    title: "Jenazah Meninggal di Luar Negeri",
-    description:
-      "Pencatatan surat pelaporan kematian luar negeri dari KBRI/KJRI untuk penerbitan surat tanda lapor.",
   },
 ];

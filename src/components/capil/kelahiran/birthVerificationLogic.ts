@@ -25,15 +25,15 @@ export const TOTAL_DOCUMENTS = 6;
 export const DIRECTIVE_PLACEHOLDER =
   "[Template arahan pesan perbaikan / tindak lanjut operator akan muncul otomatis sesuai hasil pemeriksaan di sini]";
 
-/** Satu dokumen dianggap selesai hanya jika kedua pemeriksaan sudah diisi. */
+/** Satu dokumen dianggap selesai setelah kondisi lampiran fisik dipilih. */
 export function isDocumentComplete(selection: DocumentSelection): boolean {
-  return selection.input !== "" && selection.image !== "";
+  return selection.image !== "";
 }
 
 export function evaluateDocument(selection: DocumentSelection): DocumentResult {
   if (!isDocumentComplete(selection)) return "pending";
-  if (selection.input === "sesuai" && selection.image === "jelas") return "valid";
-  if (selection.input === "kosong" || selection.image === "salah_unggah") return "tolak";
+  if (selection.image === "jelas") return "valid";
+  if (selection.image === "salah_unggah") return "tolak";
   return "perbaikan";
 }
 
@@ -53,10 +53,10 @@ export function evaluateAll(
     const title = documents[index].shortTitle;
     if (result === "tolak") {
       hasTDP = true;
-      issues.push(`${title}: Berkas fisik salah / data esensial kosong.`);
+      issues.push(`${title}: Lampiran salah unggah, rusak, atau tidak valid.`);
     } else if (result === "perbaikan") {
       hasBTL = true;
-      issues.push(`${title}: Resolusi foto buram / ejaan nama tidak sesuai identitas.`);
+      issues.push(`${title}: Lampiran buram, terpotong, atau belum terbaca jelas.`);
     }
   });
 
@@ -80,11 +80,11 @@ export function buildDirective(evaluation: Evaluation): string {
 
   switch (evaluation.status) {
     case "tdp":
-      return `Yth. Pemohon PLAVON,\nPermohonan Akta Kelahiran Anda TIDAK DAPAT DIPROSES (TDP) karena dokumen berikut tidak valid:\n- ${list}\nSilakan ajukan permohonan baru dengan melampirkan berkas fisik asli yang sah.`;
+      return `Yth. Pemohon PLAVON,\nPermohonan Akta Kelahiran Anda TIDAK DAPAT DIPROSES (TDP) karena lampiran fisik berikut tidak valid:\n- ${list}\nSilakan ajukan permohonan baru dengan melampirkan berkas fisik asli yang sah.`;
     case "btl":
-      return `Yth. Pemohon PLAVON,\nStatus permohonan Kelahiran NIK Bayi Kecil: PERBAIKAN BERKAS (BTL).\nMohon upload ulang dokumen berikut:\n- ${list}\nBatas waktu unggah perbaikan berkas adalah 3x24 jam melalui portal PLAVON.`;
+      return `Yth. Pemohon PLAVON,\nStatus permohonan Kelahiran NIK Bayi Kecil: PERBAIKAN BERKAS (BTL).\nMohon unggah ulang lampiran berikut dengan foto yang jelas dan utuh:\n- ${list}\nBatas waktu unggah perbaikan berkas adalah 3x24 jam melalui portal PLAVON.`;
     case "siap":
-      return `[PEMERIKSAAN AWAL SELESAI]\nSeluruh dokumen (KK, KTP Orang Tua & Saksi, Surat Lahir Faskes) telah memenuhi kriteria pemeriksaan awal.\nBerkas dapat ditindaklanjuti oleh operator sesuai prosedur yang berlaku.`;
+      return `[PEMERIKSAAN AWAL SELESAI]\nSeluruh lampiran fisik (KK, KTP Orang Tua & Saksi, Surat Keterangan Kelahiran) telah memenuhi kriteria pemeriksaan awal.\nBerkas dapat ditindaklanjuti oleh operator sesuai prosedur yang berlaku.`;
     default:
       return DIRECTIVE_PLACEHOLDER;
   }

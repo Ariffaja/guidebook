@@ -1,11 +1,4 @@
-/**
- * Data Verifikasi Berkas Kelahiran - NIK Bayi Kecil.
- * Seluruh label, urutan, dan pilihan disalin dari HTML Stitch (code.html).
- */
-
-/** Pemeriksaan [INPUT] Data Teks PLAVON. */
-export type InputCondition = "sesuai" | "data_beda" | "kosong";
-/** Pemeriksaan [GAMBAR] Lampiran Fisik. */
+/** Data pemeriksaan lampiran fisik kelahiran NIK Bayi Kecil. */
 export type ImageCondition = "jelas" | "buram" | "salah_unggah";
 
 export type ConditionOption<T extends string> = { value: T; label: string };
@@ -19,23 +12,13 @@ export type VerificationDocument = {
   shortTitle: string;
   /** Label pada checklist panel hasil. */
   checklistLabel: string;
-  inputOptions: ConditionOption<InputCondition>[];
   imageOptions: ConditionOption<ImageCondition>[];
 };
 
-/** Pilihan operator untuk satu dokumen. Nilai "" berarti belum diisi. */
+/** Satu pilihan lampiran fisik per dokumen. Nilai "" berarti belum diperiksa. */
 export type DocumentSelection = {
-  input: InputCondition | "";
   image: ImageCondition | "";
 };
-
-function inputOptions(sesuai: string, dataBeda: string, kosong: string): ConditionOption<InputCondition>[] {
-  return [
-    { value: "sesuai", label: sesuai },
-    { value: "data_beda", label: dataBeda },
-    { value: "kosong", label: kosong },
-  ];
-}
 
 function imageOptions(jelas: string, buram: string, salahUnggah: string): ConditionOption<ImageCondition>[] {
   return [
@@ -52,11 +35,6 @@ export const birthVerificationDocuments: VerificationDocument[] = [
     title: "KK Pemohon",
     shortTitle: "KK Pemohon",
     checklistLabel: "KK Pemohon",
-    inputOptions: inputOptions(
-      "Sesuai & Sinkron dengan SIAK",
-      "Nomor KK / Elemen Beda Karakter",
-      "Data Input Kosong / Kurang Lengkap",
-    ),
     imageOptions: imageOptions(
       "Fisik Asli Jelas & Terbaca Penuh",
       "Foto Buram / Terpotong / Fotokopi",
@@ -69,11 +47,6 @@ export const birthVerificationDocuments: VerificationDocument[] = [
     title: "KTP Pemohon",
     shortTitle: "KTP Pemohon",
     checklistLabel: "KTP Pemohon",
-    inputOptions: inputOptions(
-      "NIK & Biodata Pemohon Valid",
-      "Ketik NIK Tidak Sesuai KTP",
-      "Input NIK Kurang dari 16 Digit",
-    ),
     imageOptions: imageOptions(
       "e-KTP Asli Jelas & Hologram Terbaca",
       "Foto Gelap / Teks NIK Buram",
@@ -86,14 +59,9 @@ export const birthVerificationDocuments: VerificationDocument[] = [
     title: "Surat Keterangan Kelahiran dari Dokter/Bidan/Penolong Kelahiran",
     shortTitle: "Surat Keterangan Kelahiran",
     checklistLabel: "Ket. Kelahiran Dokter/Bidan",
-    inputOptions: inputOptions(
-      "Tanggal, Jam, Berat & Jenis Sesuai",
-      "Jam / Tanggal Lahir Tidak Cocok",
-      "Data Faskes / Dokter Kosong",
-    ),
     imageOptions: imageOptions(
-      "Surat Resmi bertanda tangan & Stempel",
-      "Tanda tangan / Stempel Samar",
+      "Surat Resmi Bertanda Tangan & Stempel",
+      "Tanda Tangan / Stempel Samar",
       "Bukan Surat Kelahiran / Form Kosong",
     ),
   },
@@ -103,11 +71,6 @@ export const birthVerificationDocuments: VerificationDocument[] = [
     title: "KTP Ayah",
     shortTitle: "KTP Ayah",
     checklistLabel: "KTP Ayah",
-    inputOptions: inputOptions(
-      "NIK & Nama Ayah Terverifikasi SIAK",
-      "Ejaan Nama Ayah Beda dengan KK",
-      "NIK Ayah Tidak Ditemukan / Kosong",
-    ),
     imageOptions: imageOptions(
       "Foto e-KTP Ayah Jelas & Asli",
       "Foto KTP Silau / Tidak Terbaca",
@@ -120,11 +83,6 @@ export const birthVerificationDocuments: VerificationDocument[] = [
     title: "KTP Ibu",
     shortTitle: "KTP Ibu",
     checklistLabel: "KTP Ibu",
-    inputOptions: inputOptions(
-      "NIK & Biodata Ibu Sesuai SIAK",
-      "Tanggal Lahir Ibu Beda dengan Data KK",
-      "Data Ibu Tidak Terisi Lengkap",
-    ),
     imageOptions: imageOptions(
       "e-KTP Ibu Asli & Seluruh Data Terbaca",
       "Foto KTP Miring & Buram",
@@ -137,11 +95,6 @@ export const birthVerificationDocuments: VerificationDocument[] = [
     title: "KTP Saksi",
     shortTitle: "KTP Saksi",
     checklistLabel: "KTP Saksi",
-    inputOptions: inputOptions(
-      "NIK & Data Saksi Kelahiran Lengkap",
-      "Saksi NIK Terdeteksi Masih di Bawah Umur",
-      "Data Saksi 1/2 Belum Dimasukkan",
-    ),
     imageOptions: imageOptions(
       "e-KTP Saksi Asli Jelas & Terlampir Lengkap",
       "Foto KTP Saksi Terpotong / Resolusi Rendah",

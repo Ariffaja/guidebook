@@ -17,7 +17,7 @@ const statusConfig: Record<
     badge: "bg-[#eceef0] text-[#424752]",
     box: "bg-[#f2f4f6]",
     headline: "MENUNGGU PILIHAN",
-    description: "Pilih kondisi data dan lampiran untuk menentukan hasil pemeriksaan.",
+    description: "Pilih kondisi lampiran fisik untuk menentukan hasil pemeriksaan.",
   },
   siap: {
     icon: "check_circle",
@@ -38,7 +38,7 @@ const statusConfig: Record<
     badge: "bg-[#ffdad6] text-[#93000a]",
     box: "bg-[#fff1f0]",
     headline: "TIDAK DAPAT DIPROSES (TDP)",
-    description: "Ditemukan data yang tidak sesuai SIAK atau berkas salah unggah.",
+    description: "Ditemukan lampiran fisik yang salah unggah, rusak, atau tidak valid.",
   },
 };
 

@@ -1,11 +1,9 @@
 import Icon from "@/components/ui/Icon";
 import {
   deathImageOptions,
-  deathInputOptions,
   type ConditionOption,
   type DeathDocumentSelection,
   type DeathImageCondition,
-  type DeathInputCondition,
   type DeathVerificationDocument,
 } from "./deathVerificationData";
 import type { DeathDocumentResult } from "./deathVerificationLogic";
@@ -69,7 +67,7 @@ type DeathVerificationCardProps = {
   onChange: (next: DeathDocumentSelection) => void;
 };
 
-/** Satu dokumen dengan dua kelompok radio terpisah: data PLAVON dan lampiran fisik. */
+/** Satu dokumen dengan tiga pilihan kondisi lampiran fisik. */
 export default function DeathVerificationCard({
   document: doc,
   selection,
@@ -94,22 +92,13 @@ export default function DeathVerificationCard({
         </span>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <ConditionRadioGroup<DeathInputCondition>
-          name={`death-input-${doc.id}`}
-          label="Data teks PLAVON"
-          value={selection.input}
-          options={deathInputOptions}
-          onChange={(input) => onChange({ ...selection, input })}
-        />
-        <ConditionRadioGroup<DeathImageCondition>
-          name={`death-image-${doc.id}`}
-          label="Lampiran fisik"
-          value={selection.image}
-          options={deathImageOptions}
-          onChange={(image) => onChange({ ...selection, image })}
-        />
-      </div>
+      <ConditionRadioGroup<DeathImageCondition>
+        name={`death-image-${doc.id}`}
+        label="Lampiran fisik"
+        value={selection.image}
+        options={deathImageOptions}
+        onChange={(image) => onChange({ image })}
+      />
     </section>
   );
 }

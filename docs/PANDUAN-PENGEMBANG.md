@@ -50,8 +50,8 @@ Skema Prisma berada di `prisma/schema.prisma`; konfigurasi koneksi Prisma ada di
 
 ### Capil — Pencatatan Sipil
 
-- Alur Kematian menyediakan kategori KTP-el, KTP lama, kepala keluarga, dan kematian di luar negeri. Kategori mengarahkan pengguna ke tahap pemeriksaan berdasarkan aturan dan data pendukung yang berada di `kematian/deathVerificationLogic.ts` dan `kematian/deathVerificationData.ts`.
-- Alur Kelahiran menyediakan kategori NIK bayi kecil (umur ≤ 18 tahun) dan kelahiran terlambat untuk penduduk dewasa. Verifikasi bayi kecil menggunakan aturan dan data di `kelahiran/birthVerificationLogic.ts` dan `kelahiran/birthVerificationData.ts`.
+- Alur Kematian menyediakan dua kategori: KTP-el dan KTP lama. Pada tahap verifikasi yang tersedia, operator hanya memilih kondisi lampiran fisik (jelas, buram, atau salah unggah/rusak); tidak ada pemeriksaan teks/input PLAVON terpisah. Hasil valid, BTL, atau TDP dihitung dari pilihan lampiran.
+- Alur Kelahiran menyediakan kategori NIK bayi kecil (umur ≤ 18 tahun) dan kelahiran terlambat untuk penduduk dewasa. Verifikasi bayi kecil menggunakan tiga kondisi lampiran fisik saja; tidak ada pemeriksaan teks/input PLAVON terpisah. Aturan hasilnya berada di `kelahiran/birthVerificationLogic.ts` dan `kelahiran/birthVerificationData.ts`.
 - `CapilModule` mengatur perpindahan langkah di sisi browser. Kategori bayi dewasa saat ini belum memiliki langkah verifikasi; verifikasi kelahiran yang dihubungkan adalah untuk bayi kecil.
 - Antarmuka menampilkan hasil pemeriksaan dokumen/klasifikasi berdasarkan data aturan lokal. Periksa sumber data dan logika terkait sebelum mengubah hasil yang disarankan.
 

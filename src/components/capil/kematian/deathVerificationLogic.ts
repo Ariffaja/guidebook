@@ -5,8 +5,7 @@ import type {
 
 /**
  * Logika evaluasi Verifikasi Berkas Kematian. Fungsi murni tanpa akses DOM.
- * Catatan: arti nilai input BERBEDA dari kelahiran
- * (di sini tidak_sesuai = TOLAK, tidak_lengkap = PERBAIKAN).
+ * Evaluasi hanya memakai kondisi lampiran fisik yang dipilih operator.
  */
 
 /** Hasil evaluasi satu dokumen. */
@@ -31,16 +30,15 @@ export const TOTAL_DEATH_DOCUMENTS = 6;
 export const DEATH_DIRECTIVE_PLACEHOLDER =
   "[Template arahan pesan perbaikan / tindak lanjut operator akan muncul otomatis sesuai hasil pemeriksaan di sini]";
 
-/** Satu dokumen dianggap selesai hanya jika kedua pemeriksaan sudah diisi. */
+/** Satu dokumen dianggap selesai setelah kondisi lampiran fisik dipilih. */
 export function isDocumentComplete(selection: DeathDocumentSelection): boolean {
-  return selection.input !== "" && selection.image !== "";
+  return selection.image !== "";
 }
 
 export function evaluateDocument(selection: DeathDocumentSelection): DeathDocumentResult {
   if (!isDocumentComplete(selection)) return "pending";
-  if (selection.input === "sesuai" && selection.image === "jelas") return "valid";
-  if (selection.input === "tidak_sesuai" || selection.image === "salah_unggah") return "tolak";
-  // Sisanya: input tidak_lengkap atau gambar buram (dan tidak memenuhi kondisi TOLAK).
+  if (selection.image === "jelas") return "valid";
+  if (selection.image === "salah_unggah") return "tolak";
   return "perbaikan";
 }
 
@@ -58,9 +56,9 @@ export function evaluateAll(
     completedCount += 1;
     const title = documents[index].title;
     if (result === "tolak") {
-      tolakIssues.push(`${title} (Data tidak sesuai SIAK / berkas fisik tidak valid)`);
+      tolakIssues.push(`${title} (lampiran fisik salah unggah, rusak, atau tidak valid)`);
     } else if (result === "perbaikan") {
-      perbaikanIssues.push(`${title} (Data kurang lengkap / berkas fisik buram)`);
+      perbaikanIssues.push(`${title} (lampiran fisik buram atau tidak terbaca)`);
     }
   });
 
@@ -83,11 +81,11 @@ export function evaluateAll(
 export function buildDirective(evaluation: DeathEvaluation): string {
   switch (evaluation.status) {
     case "tdp":
-      return `Yth. Pemohon PLAVON, pengajuan Akta Kematian Anda TIDAK DAPAT DIPROSES (TDP) karena terdapat ketidaksesuaian data pokok: ${evaluation.tolakIssues.join(", ")}. Silakan lakukan permohonan ulang dengan data kependudukan yang sah.`;
+      return `Yth. Pemohon PLAVON, pengajuan Akta Kematian Anda TIDAK DAPAT DIPROSES (TDP) karena lampiran fisik berikut salah, rusak, atau tidak valid: ${evaluation.tolakIssues.join(", ")}. Silakan ajukan kembali dengan lampiran fisik yang benar dan sah.`;
     case "btl":
-      return `Yth. Pemohon PLAVON, berkas Akta Kematian Anda status BERKAS TIDAK LENGKAP (BTL). Mohon unggah kembali dokumen berikut dengan foto yang jelas/terbaca: ${evaluation.perbaikanIssues.join(", ")}. Batas perbaikan 3x24 jam.`;
+      return `Yth. Pemohon PLAVON, berkas Akta Kematian Anda BERKAS TIDAK LENGKAP (BTL). Mohon unggah ulang lampiran fisik berikut dengan foto yang jelas dan terbaca: ${evaluation.perbaikanIssues.join(", ")}. Batas perbaikan 3x24 jam.`;
     case "siap":
-      return "[PEMERIKSAAN AWAL SELESAI] Keenam dokumen telah memenuhi kriteria pemeriksaan awal dan dapat ditindaklanjuti operator sesuai prosedur yang berlaku.";
+      return "[PEMERIKSAAN AWAL SELESAI] Keenam lampiran fisik telah memenuhi kriteria pemeriksaan awal dan dapat ditindaklanjuti operator sesuai prosedur yang berlaku.";
     default:
       return DEATH_DIRECTIVE_PLACEHOLDER;
   }

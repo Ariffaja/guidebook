@@ -22,7 +22,7 @@ type DeathVerificationStepProps = {
 type ToastState = { id: number; icon: string; message: ReactNode };
 
 const emptySelections = (): DeathDocumentSelection[] =>
-  deathVerificationDocuments.map(() => ({ input: "", image: "" }));
+  deathVerificationDocuments.map(() => ({ image: "" }));
 
 /**
  * Simulasi panduan verifikasi berkas kematian untuk operator.
@@ -68,7 +68,7 @@ export default function DeathVerificationStep({
           Verifikasi Berkas: {categoryTitle}
         </h1>
         <p className="max-w-3xl text-sm text-[#424752]">
-          Pilih kondisi data dan lampiran untuk setiap dokumen. Status serta arahan operator akan diperbarui otomatis.
+          Pilih kondisi lampiran fisik untuk setiap dokumen. Status serta arahan operator akan diperbarui otomatis.
         </p>
       </div>
 
