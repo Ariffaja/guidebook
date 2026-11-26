@@ -1,8 +1,8 @@
 import Icon from "@/components/ui/Icon";
 import type { VerificationDocument } from "./birthVerificationData";
 import {
-  TOTAL_DOCUMENTS,
   buildDirective,
+  type BirthParentClassification,
   type DocumentResult,
   type Evaluation,
   type OverallStatus,
@@ -35,7 +35,7 @@ const statusConfig: Record<OverallStatus, StatusConfig> = {
     iconClass: "text-[#006a6a]",
     headline: "SIAP DIVERIFIKASI (VALID)",
     headlineClass: "font-bold text-[#006a6a]",
-    desc: "Seluruh enam dokumen telah memenuhi kriteria pemeriksaan awal dan dapat ditindaklanjuti operator sesuai prosedur yang berlaku.",
+    desc: "Seluruh tujuh dokumen telah memenuhi kriteria pemeriksaan awal dan dapat ditindaklanjuti operator sesuai prosedur yang berlaku.",
   },
   btl: {
     box: "bg-[#ffdbcc] text-[#7b2f00]",
@@ -69,6 +69,10 @@ const sectionLabel = "text-[9px] font-bold uppercase tracking-[1.3px] text-[#657
 type BirthVerificationResultPanelProps = {
   documents: VerificationDocument[];
   evaluation: Evaluation;
+  parentClassification: BirthParentClassification | null;
+  requireParentClassification?: boolean;
+  serviceName?: string;
+  pendingRequirementMessage?: string;
   onCopy: (text: string) => void;
 };
 
@@ -76,14 +80,27 @@ type BirthVerificationResultPanelProps = {
 export default function BirthVerificationResultPanel({
   documents,
   evaluation,
+  parentClassification,
+  requireParentClassification = true,
+  serviceName = "NIK Bayi Kecil",
+  pendingRequirementMessage = "Lengkapi klasifikasi status anak pada kotak di atas sebelum menyatakan berkas siap.",
   onCopy,
 }: BirthVerificationResultPanelProps) {
-  const config = statusConfig[evaluation.status];
-  const directive = buildDirective(evaluation);
-  const remaining = TOTAL_DOCUMENTS - evaluation.completedCount;
+  const needsClassification = requireParentClassification && !parentClassification;
+  const status = evaluation.status === "siap" && needsClassification ? "menunggu" : evaluation.status;
+  const baseConfig = statusConfig[status];
+  const config = status === "siap"
+    ? { ...baseConfig, desc: `Seluruh ${evaluation.totalCount} dokumen telah memenuhi kriteria pemeriksaan awal dan dapat ditindaklanjuti operator sesuai prosedur yang berlaku.` }
+    : baseConfig;
+  const directive = status === "menunggu" && evaluation.status === "siap" && needsClassification
+    ? pendingRequirementMessage
+    : buildDirective(evaluation, serviceName);
+  const remaining = evaluation.totalCount - evaluation.completedCount;
   const description =
-    evaluation.status === "menunggu" && evaluation.completedCount > 0
-      ? `Lengkapi ${remaining} berkas tersisa untuk menentukan status validasi akhir.`
+    status === "menunggu" && evaluation.status === "siap" && needsClassification
+      ? pendingRequirementMessage
+      : status === "menunggu" && evaluation.completedCount > 0
+        ? `Lengkapi ${remaining} berkas tersisa untuk menentukan status validasi akhir.`
       : config.desc;
 
   return (

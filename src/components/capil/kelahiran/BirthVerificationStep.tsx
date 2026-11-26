@@ -5,9 +5,10 @@ import Breadcrumb from "@/components/ui/Breadcrumb";
 import Icon from "@/components/ui/Icon";
 import Toast from "@/components/ui/Toast";
 import BirthVerificationCard from "./BirthVerificationCard";
+import BirthParentClassificationCard from "./BirthParentClassificationCard";
 import BirthVerificationResultPanel from "./BirthVerificationResultPanel";
 import { birthVerificationDocuments, type DocumentSelection } from "./birthVerificationData";
-import { evaluateAll } from "./birthVerificationLogic";
+import { evaluateAll, type BirthParentClassification } from "./birthVerificationLogic";
 
 type BirthVerificationStepProps = {
   onBackToService: () => void;
@@ -28,6 +29,7 @@ export default function BirthVerificationStep({
   onBackToCategory,
 }: BirthVerificationStepProps) {
   const [selections, setSelections] = useState<DocumentSelection[]>(emptySelections);
+  const [parentClassification, setParentClassification] = useState<BirthParentClassification | null>(null);
   const [toast, setToast] = useState<ToastState | null>(null);
   const closeToast = useCallback(() => setToast(null), []);
 
@@ -73,6 +75,8 @@ export default function BirthVerificationStep({
         </span>
       </div>
 
+      <BirthParentClassificationCard onClassificationChange={setParentClassification} />
+
       <div className="grid grid-cols-1 items-start gap-5 lg:grid-cols-[minmax(0,1.55fr)_minmax(300px,0.9fr)]">
         <div className="flex flex-col gap-4">
           {birthVerificationDocuments.map((doc, index) => (
@@ -90,6 +94,7 @@ export default function BirthVerificationStep({
           <BirthVerificationResultPanel
             documents={birthVerificationDocuments}
             evaluation={evaluation}
+            parentClassification={parentClassification}
             onCopy={handleCopy}
           />
         </aside>

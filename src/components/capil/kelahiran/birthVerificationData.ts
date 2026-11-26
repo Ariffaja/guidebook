@@ -101,4 +101,16 @@ export const birthVerificationDocuments: VerificationDocument[] = [
       "Lampiran Saksi Hilang / Bukan KTP",
     ),
   },
+  {
+    id: 7,
+    icon: "menu_book",
+    title: "Kutipan Nikah / Akta Perkawinan Orang Tua",
+    shortTitle: "Kutipan Nikah / Akta Perkawinan",
+    checklistLabel: "Kutipan Nikah / Akta Perkawinan",
+    imageOptions: imageOptions(
+      "Kutipan / Akta Asli Jelas & Terbaca",
+      "Dokumen Buram / Tidak Terbaca",
+      "Dokumen Tidak Ada / Salah Berkas",
+    ),
+  },
 ];

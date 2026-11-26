@@ -51,8 +51,9 @@ Skema Prisma berada di `prisma/schema.prisma`; konfigurasi koneksi Prisma ada di
 ### Capil — Pencatatan Sipil
 
 - Alur Kematian menyediakan dua kategori: KTP-el dan KTP lama. Pada tahap verifikasi yang tersedia, operator hanya memilih kondisi lampiran fisik (jelas, buram, atau salah unggah/rusak); tidak ada pemeriksaan teks/input PLAVON terpisah. Hasil valid, BTL, atau TDP dihitung dari pilihan lampiran.
-- Alur Kelahiran menyediakan kategori NIK bayi kecil (umur ≤ 18 tahun) dan kelahiran terlambat untuk penduduk dewasa. Verifikasi bayi kecil menggunakan tiga kondisi lampiran fisik saja; tidak ada pemeriksaan teks/input PLAVON terpisah. Aturan hasilnya berada di `kelahiran/birthVerificationLogic.ts` dan `kelahiran/birthVerificationData.ts`.
-- `CapilModule` mengatur perpindahan langkah di sisi browser. Kategori bayi dewasa saat ini belum memiliki langkah verifikasi; verifikasi kelahiran yang dihubungkan adalah untuk bayi kecil.
+- Alur Kelahiran menyediakan kategori NIK bayi kecil (umur ≤ 18 tahun) dan kelahiran terlambat untuk penduduk dewasa. Verifikasi bayi kecil memakai klasifikasi Anak Seorang Ibu (ASI) atau Anak Ibu dan Ayah berdasarkan urutan tanggal lahir dan tanggal perkawinan; waktu diminta hanya jika kedua tanggal sama. Hasil klasifikasi ditampilkan otomatis setelah tanggal (dan, jika perlu, waktu) lengkap. Checklist bayi kecil mencakup tujuh dokumen, termasuk Kutipan/Akta Nikah, dan tiap dokumen memiliki tiga kondisi lampiran fisik.
+- Verifikasi NIK Bayi Dewasa mewajibkan enam berkas: KK pemohon, KTP pemohon, KTP saksi, SPTJM Kebenaran Data Kelahiran, SPTJM Kebenaran Data Urutan Saudara Kandung, dan SPTJM Kebenaran sebagai Pasangan Suami Istri. Sistem bertanya apakah pemohon melampirkan akta nikah. Jika “Ya”, kotak pemeriksaan akta dan klasifikasi tanggal lahir/perkawinan ditampilkan; jika “Tidak”, kotak akta dan klasifikasi tidak ditampilkan. Aturan evaluasi bersama berada di `kelahiran/birthVerificationLogic.ts`; data dokumen dewasa berada di `kelahiran/adultBirthVerificationData.ts`.
+- `CapilModule` mengatur perpindahan langkah di sisi browser untuk verifikasi NIK Bayi Kecil dan NIK Bayi Dewasa.
 - Antarmuka menampilkan hasil pemeriksaan dokumen/klasifikasi berdasarkan data aturan lokal. Periksa sumber data dan logika terkait sebelum mengubah hasil yang disarankan.
 
 ### SOP Directory
@@ -135,7 +136,7 @@ Riwayat SOP diatur server-side dengan izin yang sama seperti pengelolaan SOP. Lo
 - `dafduk/` — pilihan layanan, klasifikasi Pindah Keluar, verifikasi dokumen.
 - `capil/` — pemilih layanan dan modul langkah Capil.
 - `capil/kematian/` — kategori, langkah verifikasi, panel hasil, kartu, data, dan aturan Kematian.
-- `capil/kelahiran/` — kategori, langkah verifikasi, panel hasil, kartu, data, dan aturan Kelahiran.
+- `capil/kelahiran/` — kategori dan langkah verifikasi NIK Bayi Kecil/Dewasa, panel hasil, kartu, data dokumen, klasifikasi tanggal, dan aturan evaluasi Kelahiran.
 - `sop/` — direktori, filter, daftar/detail kasus, form, badge, tipe/data lama, dan perhitungan tenggat.
 - `accounts/` — daftar/form akun, reset dan ubah sandi, impor akun Magang.
 

@@ -1,19 +1,17 @@
 "use client";
 
-import { useCallback, useState, type ReactNode } from "react";
 import Breadcrumb from "@/components/ui/Breadcrumb";
 import Icon from "@/components/ui/Icon";
 import StepNavigation from "@/components/ui/StepNavigation";
-import Toast from "@/components/ui/Toast";
 import { birthCategories, type BirthCategory } from "./categories";
 
 type BirthCategoryStepProps = {
   onBack: () => void;
   /** Dipanggil saat kategori NIK Bayi Kecil dipilih. */
   onVerifyBayiKecil: () => void;
+  /** Dipanggil saat kategori NIK Bayi Dewasa dipilih. */
+  onVerifyBayiDewasa: () => void;
 };
-
-type ToastState = { id: number; icon: string; message: ReactNode };
 
 /**
  * Kartu kategori kelahiran. Dibuat lokal (bukan SelectableCard) karena desain Stitch-nya
@@ -74,31 +72,19 @@ function BirthCategoryCard({
 
 /**
  * Tahap Capil: pilih kategori kelahiran (NIK Bayi Kecil / NIK Bayi Dewasa).
- * NIK Bayi Kecil lanjut ke Verifikasi Berkas; NIK Bayi Dewasa masih placeholder Toast
- * karena desain dan prosedurnya belum tersedia.
+ * NIK Bayi Kecil dan NIK Bayi Dewasa masing-masing lanjut ke panduan verifikasi berkas.
  */
 export default function BirthCategoryStep({
   onBack,
   onVerifyBayiKecil,
+  onVerifyBayiDewasa,
 }: BirthCategoryStepProps) {
-  const [toast, setToast] = useState<ToastState | null>(null);
-  const closeToast = useCallback(() => setToast(null), []);
-
   function handleSelect(category: BirthCategory) {
     if (category.key === "bayi-kecil") {
       onVerifyBayiKecil();
       return;
     }
-
-    setToast({
-      id: Date.now(),
-      icon: "info",
-      message: (
-        <>
-          Kategori <strong>{category.title}</strong> dipilih. Halaman panduan berkas belum tersedia.
-        </>
-      ),
-    });
+    onVerifyBayiDewasa();
   }
 
   return (
@@ -133,11 +119,6 @@ export default function BirthCategoryStep({
 
       <StepNavigation back={{ label: "Kembali", onClick: onBack }} />
 
-      {toast && (
-        <Toast key={toast.id} icon={toast.icon} onClose={closeToast}>
-          {toast.message}
-        </Toast>
-      )}
     </div>
   );
 }

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import BirthCategoryStep from "./kelahiran/BirthCategoryStep";
 import BirthVerificationStep from "./kelahiran/BirthVerificationStep";
+import AdultBirthVerificationStep from "./kelahiran/AdultBirthVerificationStep";
 import DeathCategoryStep from "./kematian/DeathCategoryStep";
 import DeathVerificationStep from "./kematian/DeathVerificationStep";
 import ServiceStep from "./ServiceStep";
@@ -14,7 +15,8 @@ type CapilView =
   | "kategori-kematian"
   | "verifikasi-kematian"
   | "kategori-kelahiran"
-  | "verifikasi-bayi-kecil";
+  | "verifikasi-bayi-kecil"
+  | "verifikasi-bayi-dewasa";
 
 /** Pemegang state modul Capil: pilihan layanan, kategori, dan tahap yang tampil. */
 export default function CapilModule() {
@@ -24,7 +26,7 @@ export default function CapilModule() {
   const deathCategoryTitle =
     deathCategories.find((category) => category.key === deathCategory)?.title ?? "";
   // Halaman verifikasi memakai layout dua kolom sehingga membutuhkan wadah yang lebih lebar.
-  const isWideView = view === "verifikasi-bayi-kecil" || view === "verifikasi-kematian";
+  const isWideView = view === "verifikasi-bayi-kecil" || view === "verifikasi-bayi-dewasa" || view === "verifikasi-kematian";
 
   function goTo(next: CapilView) {
     setView(next);
@@ -64,10 +66,17 @@ export default function CapilModule() {
         <BirthCategoryStep
           onBack={() => goTo("layanan")}
           onVerifyBayiKecil={() => goTo("verifikasi-bayi-kecil")}
+          onVerifyBayiDewasa={() => goTo("verifikasi-bayi-dewasa")}
         />
       )}
       {view === "verifikasi-bayi-kecil" && (
         <BirthVerificationStep
+          onBackToService={() => goTo("layanan")}
+          onBackToCategory={() => goTo("kategori-kelahiran")}
+        />
+      )}
+      {view === "verifikasi-bayi-dewasa" && (
+        <AdultBirthVerificationStep
           onBackToService={() => goTo("layanan")}
           onBackToCategory={() => goTo("kategori-kelahiran")}
         />
