@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import Icon from "@/components/ui/Icon";
 
 type SidebarProps = {
@@ -70,6 +70,47 @@ function NavSection({
   );
 }
 
+function AdminNav({ pathname, onNavigate }: { pathname: string; onNavigate?: () => void }) {
+  const searchParams = useSearchParams();
+  const accountRole = searchParams.get("role");
+  const isArchive = searchParams.get("view") === "archive";
+  const accountActive = pathname === "/account-management" || pathname.startsWith("/account-management/");
+  const items: NavItem[] = [
+    { label: "Direktori SOP", href: "/sop-directory", icon: "menu_book" },
+    { label: "Riwayat SOP", href: "/admin/sop-history", icon: "history" },
+    { label: "Arsip", href: "/sop-directory?view=archive", icon: "archive" },
+  ];
+
+  return (
+    <div className="pb-5">
+      <div className="px-6 pt-5">
+        <Link href="/admin" onClick={onNavigate} aria-current={pathname === "/admin" ? "page" : undefined} className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${pathname === "/admin" ? "bg-blue-50 text-[#0056B3]" : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"}`}>
+          <Icon name="dashboard" className={`text-[20px] ${pathname === "/admin" ? "text-[#0056B3]" : "text-slate-500"}`} />Dashboard
+        </Link>
+      </div>
+      <NavSection title="Menu" items={documentationNav.slice(0, 2)} pathname={pathname} onNavigate={onNavigate} />
+      <div className="px-6 pt-6">
+        <div className="mb-2 px-2 text-[11px] font-semibold uppercase tracking-wider text-slate-400">Data Master</div>
+        <nav className="flex flex-col gap-1" aria-label="Data Master">
+          <Link href="/account-management" onClick={onNavigate} aria-current={accountActive ? "page" : undefined} className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${accountActive ? "bg-blue-50 text-[#0056B3]" : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"}`}>
+            <Icon name="manage_accounts" className={`text-[20px] ${accountActive ? "text-[#0056B3]" : "text-slate-500"}`} />Kelola Akun
+          </Link>
+          <Link href="/account-management?role=MENTOR" onClick={onNavigate} aria-current={accountActive && accountRole === "MENTOR" ? "page" : undefined} className={`ml-8 flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium transition-colors ${accountActive && accountRole === "MENTOR" ? "bg-blue-50 text-[#0056B3]" : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"}`}><Icon name="supervisor_account" className="text-[17px]" />Mentor</Link>
+          <Link href="/account-management?role=MAGANG" onClick={onNavigate} aria-current={accountActive && accountRole === "MAGANG" ? "page" : undefined} className={`ml-8 flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium transition-colors ${accountActive && accountRole === "MAGANG" ? "bg-blue-50 text-[#0056B3]" : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"}`}><Icon name="school" className="text-[17px]" />Peserta Magang</Link>
+          {items.map((item) => {
+            const active = item.href === "/sop-directory"
+              ? pathname === item.href && !isArchive
+              : item.href === "/admin/sop-history"
+                ? pathname.startsWith(item.href)
+                : pathname === "/sop-directory" && isArchive;
+            return <Link key={item.label} href={item.href} onClick={onNavigate} aria-current={active ? "page" : undefined} className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${active ? "bg-blue-50 text-[#0056B3]" : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"}`}><Icon name={item.icon} className={`text-[20px] ${active ? "text-[#0056B3]" : "text-slate-500"}`} /><span>{item.label}</span></Link>;
+          })}
+        </nav>
+      </div>
+    </div>
+  );
+}
+
 export default function Sidebar({ drawer = false, onNavigate, isAdmin = false }: SidebarProps) {
   const pathname = usePathname();
 
@@ -97,16 +138,16 @@ export default function Sidebar({ drawer = false, onNavigate, isAdmin = false }:
           </div>
         </Link>
 
-        <NavSection
-          title="Menu Utama"
-          items={[
-            ...documentationNav,
-            ...(isAdmin ? [{ label: "Manajemen Akun", href: "/account-management", icon: "manage_accounts" }] : []),
-            { label: "Tentang", href: "/tentang", icon: "info" },
-          ]}
-          pathname={pathname}
-          onNavigate={onNavigate}
-        />
+        {isAdmin ? (
+          <AdminNav pathname={pathname} onNavigate={onNavigate} />
+        ) : (
+          <NavSection
+            title="Menu Utama"
+            items={[...documentationNav, { label: "Tentang", href: "/tentang", icon: "info" }]}
+            pathname={pathname}
+            onNavigate={onNavigate}
+          />
+        )}
       </div>
 
       {/* Operator profile */}

@@ -7,11 +7,12 @@ import { prisma } from "@/lib/prisma";
 
 export const metadata: Metadata = { title: "Manajemen Akun - GUIDEBOOK ADMINDUK" };
 
-export default async function AccountManagementPage({ searchParams }: { searchParams?: Promise<{ status?: string }> }) {
+export default async function AccountManagementPage({ searchParams }: { searchParams?: Promise<{ status?: string; role?: string }> }) {
   const session = await auth();
   if (!session?.user || !session.user.isActive) redirect("/login");
   if (session.user.role !== "ADMIN") redirect("/");
   const params = searchParams ? await searchParams : {};
+  const initialRole = params.role === "MENTOR" || params.role === "MAGANG" || params.role === "ADMIN" ? params.role : "all";
   const users = await prisma.user.findMany({
     orderBy: [{ isActive: "desc" }, { name: "asc" }],
     include: { role: { select: { name: true } }, sopDivisions: { select: { division: true } } },
@@ -25,5 +26,5 @@ export default async function AccountManagementPage({ searchParams }: { searchPa
     sopDivisions: sopDivisions.map(({ division }) => division),
   }));
 
-  return <AppLayout pageLabel="Manajemen Akun"><AccountManagement accounts={accounts} currentUserId={Number(session.user.id)} status={params.status} /></AppLayout>;
+  return <AppLayout pageLabel="Manajemen Akun"><AccountManagement key={initialRole} accounts={accounts} currentUserId={Number(session.user.id)} status={params.status} initialRole={initialRole} /></AppLayout>;
 }

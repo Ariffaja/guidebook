@@ -12,9 +12,9 @@ type PageSize = 5 | 10 | "all";
 
 const roleLabels: Record<string, string> = { ADMIN: "Admin", MENTOR: "Mentor", MAGANG: "Magang" };
 
-export default function AccountManagement({ accounts, currentUserId, status }: { accounts: AccountRow[]; currentUserId: number; status?: string }) {
+export default function AccountManagement({ accounts, currentUserId, status, initialRole = "all" }: { accounts: AccountRow[]; currentUserId: number; status?: string; initialRole?: RoleFilter }) {
   const [query, setQuery] = useState("");
-  const [role, setRole] = useState<RoleFilter>("all");
+  const [role, setRole] = useState<RoleFilter>(initialRole);
   const [state, setState] = useState<StatusFilter>("all");
   const [pageSize, setPageSize] = useState<PageSize>(5);
   const [currentPage, setCurrentPage] = useState(1);
