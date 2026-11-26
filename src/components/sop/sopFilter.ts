@@ -2,7 +2,7 @@ import type { SopCase, SopCategory, SopClassification, SopCaseType } from "./sop
 import { sopClassifications, sopCaseTypeLabels } from "./sopTypes";
 
 /**
- * Fungsi murni untuk pencarian dan filter SOP Directory (tanpa React/DOM).
+ * Fungsi murni untuk pencarian dan filter Direktori SOP (tanpa React/DOM).
  * Pencarian: tidak peka huruf besar/kecil, semua kata kunci harus ditemukan (AND),
  * dan mencakup judul, nomor catatan, deskripsi, keywords, serta isi templat.
  */

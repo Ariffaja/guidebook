@@ -6,7 +6,7 @@ import SopCaseForm from "@/components/sop/SopCaseForm";
 import { getSopAccess } from "@/lib/sopAccess";
 
 export const metadata: Metadata = {
-  title: "Tambah Kasus SOP - SOP Directory",
+  title: "Tambah Kasus SOP - Direktori SOP",
 };
 
 export default async function NewSopCasePage() {

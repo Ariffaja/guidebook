@@ -26,7 +26,7 @@ const modules = [
   },
   {
     icon: "menu_book",
-    label: "SOP Directory",
+    label: "Direktori SOP",
     title: "Catatan Kasus dan Templat Respons",
     description:
       "Kumpulan catatan kasus beserta templat respons operasional yang dapat dicari, disaring, dan disalin.",
@@ -93,7 +93,7 @@ export default function TentangPage() {
               SIAK.
             </span>
             <span>
-              Catatan pada SOP Directory adalah catatan yang saat ini terkumpul, bukan keseluruhan kasus
+              Catatan pada Direktori SOP adalah catatan yang saat ini terkumpul, bukan keseluruhan kasus
               operasional.
             </span>
           </div>

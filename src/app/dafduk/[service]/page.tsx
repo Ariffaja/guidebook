@@ -6,6 +6,7 @@ import Breadcrumb from "@/components/ui/Breadcrumb";
 import { dafdukServices } from "@/components/dafduk/services";
 import PindahKeluarClassification from "@/components/dafduk/PindahKeluarClassification";
 import DafdukPindahDatangVerification from "@/components/dafduk/DafdukPindahDatangVerification";
+import { requireMentorDivision } from "@/lib/mentorAccess";
 
 type DafdukServicePageProps = {
   params: Promise<{ service: string }>;
@@ -21,6 +22,7 @@ export default async function DafdukServicePage({ params }: DafdukServicePagePro
   const { service: serviceKey } = await params;
   const service = dafdukServices.find((item) => item.key === serviceKey);
   if (!service) notFound();
+  await requireMentorDivision("dafduk");
 
   if (service.key === "pindah-datang") {
     return (

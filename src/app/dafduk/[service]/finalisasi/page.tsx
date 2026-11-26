@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import AppLayout from "@/components/layout/AppLayout";
 import Breadcrumb from "@/components/ui/Breadcrumb";
+import { requireMentorDivision } from "@/lib/mentorAccess";
 
 export default async function FinalisasiPage({
   params,
@@ -10,6 +11,7 @@ export default async function FinalisasiPage({
 }) {
   const { service } = await params;
   if (service !== "pindah-keluar" && service !== "pindah-datang") notFound();
+  await requireMentorDivision("dafduk");
 
   const isArrival = service === "pindah-datang";
   const serviceTitle = isArrival ? "Pindah Datang" : "Pindah Keluar";

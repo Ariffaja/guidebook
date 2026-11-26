@@ -81,7 +81,7 @@ export default async function SopHistoryPage({ params }: { params: Promise<{ id:
     <AppLayout pageLabel="Riwayat SOP">
       <main className="mx-auto w-full max-w-5xl pb-8">
         <Link href={backHref} className="mb-5 inline-flex items-center gap-1.5 text-sm font-medium text-[#0056B3] hover:text-[#003F87]">
-          <Icon name="arrow_back" className="text-[18px]" /> Kembali ke {isArchived ? "Arsip SOP" : "SOP Directory"}
+          <Icon name="arrow_back" className="text-[18px]" /> Kembali ke {isArchived ? "Arsip SOP" : "Direktori SOP"}
         </Link>
 
         <header className="mb-6">

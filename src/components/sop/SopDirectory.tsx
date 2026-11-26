@@ -126,7 +126,7 @@ export default function SopDirectory({ cases, holidays, completeYears, allowedCa
     <div className="flex w-full flex-col pb-8">
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div className="flex flex-col gap-1">
-          <h1 className="text-2xl font-semibold tracking-tight text-[#191c1e] sm:text-[32px] sm:leading-10">{showArchived ? "Arsip SOP" : "SOP Directory"}</h1>
+          <h1 className="text-2xl font-semibold tracking-tight text-[#191c1e] sm:text-[32px] sm:leading-10">{showArchived ? "Arsip SOP" : "Direktori SOP"}</h1>
           <p className="max-w-3xl text-base text-[#424752]">Pusat informasi kasus dan templat respons operasional pelayanan administrasi kependudukan.</p>
         </div>
         {canManage && <div className="flex shrink-0 flex-wrap gap-2">

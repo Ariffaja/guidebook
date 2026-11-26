@@ -44,6 +44,9 @@ export default async function HomePage() {
   if (session.user.role === "ADMIN") {
     redirect("/admin");
   }
+  if (session.user.role === "MENTOR") {
+    redirect("/mentor");
+  }
 
   return (
     <AppLayout pageLabel="Beranda Panduan">

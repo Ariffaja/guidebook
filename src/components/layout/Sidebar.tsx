@@ -10,6 +10,8 @@ type SidebarProps = {
   /** Dipanggil saat sebuah tautan diklik, dipakai untuk menutup menu geser. */
   onNavigate?: () => void;
   isAdmin?: boolean;
+  isMentor?: boolean;
+  mentorCategories?: ("dafduk" | "capil")[];
 };
 
 type NavItem = {
@@ -21,7 +23,7 @@ type NavItem = {
 const documentationNav: NavItem[] = [
   { label: "Pendaftaran Kependudukan", href: "/dafduk", icon: "badge" },
   { label: "Pencatatan Sipil", href: "/capil", icon: "assignment" },
-  { label: "SOP Directory", href: "/sop-directory", icon: "menu_book" },
+  { label: "Direktori SOP", href: "/sop-directory", icon: "menu_book" },
 ];
 
 function NavSection({
@@ -111,7 +113,32 @@ function AdminNav({ pathname, onNavigate }: { pathname: string; onNavigate?: () 
   );
 }
 
-export default function Sidebar({ drawer = false, onNavigate, isAdmin = false }: SidebarProps) {
+function MentorNav({ pathname, onNavigate, categories }: { pathname: string; onNavigate?: () => void; categories: ("dafduk" | "capil")[] }) {
+  const searchParams = useSearchParams();
+  const isArchive = searchParams.get("view") === "archive";
+  const categoryItems = documentationNav.filter((item) =>
+    (item.href === "/dafduk" && categories.includes("dafduk")) ||
+    (item.href === "/capil" && categories.includes("capil")),
+  );
+
+  return (
+    <div className="pb-5">
+      <div className="px-6 pt-5">
+        <Link href="/mentor" onClick={onNavigate} aria-current={pathname === "/mentor" ? "page" : undefined} className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${pathname === "/mentor" ? "bg-blue-50 text-[#0056B3]" : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"}`}><Icon name="dashboard" className={`text-[20px] ${pathname === "/mentor" ? "text-[#0056B3]" : "text-slate-500"}`} />Dashboard</Link>
+      </div>
+      {categoryItems.length > 0 && <NavSection title="Menu" items={categoryItems} pathname={pathname} onNavigate={onNavigate} />}
+      {categories.length > 0 && <div className="px-6 pt-6">
+        <div className="mb-2 px-2 text-[11px] font-semibold uppercase tracking-wider text-slate-400">Data Master</div>
+        <nav className="flex flex-col gap-1" aria-label="Data Master">
+          <Link href="/sop-directory" onClick={onNavigate} aria-current={pathname === "/sop-directory" && !isArchive ? "page" : undefined} className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${pathname === "/sop-directory" && !isArchive ? "bg-blue-50 text-[#0056B3]" : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"}`}><Icon name="menu_book" className="text-[20px]" /><span>Direktori SOP</span></Link>
+          <Link href="/sop-directory?view=archive" onClick={onNavigate} aria-current={pathname === "/sop-directory" && isArchive ? "page" : undefined} className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${pathname === "/sop-directory" && isArchive ? "bg-blue-50 text-[#0056B3]" : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"}`}><Icon name="archive" className="text-[20px]" /><span>Arsip SOP</span></Link>
+        </nav>
+      </div>}
+    </div>
+  );
+}
+
+export default function Sidebar({ drawer = false, onNavigate, isAdmin = false, isMentor = false, mentorCategories = [] }: SidebarProps) {
   const pathname = usePathname();
 
   return (
@@ -140,6 +167,8 @@ export default function Sidebar({ drawer = false, onNavigate, isAdmin = false }:
 
         {isAdmin ? (
           <AdminNav pathname={pathname} onNavigate={onNavigate} />
+        ) : isMentor ? (
+          <MentorNav pathname={pathname} onNavigate={onNavigate} categories={mentorCategories} />
         ) : (
           <NavSection
             title="Menu Utama"

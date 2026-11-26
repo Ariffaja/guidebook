@@ -152,16 +152,12 @@ export async function resetAccountPassword(id: number, _previous: PasswordFormSt
 export async function changeOwnPassword(_previous: PasswordFormState, formData: FormData): Promise<PasswordFormState> {
   const session = await auth();
   if (!session?.user || !session.user.isActive) return { error: "Sesi tidak aktif. Masuk kembali." };
-  const currentPassword = String(formData.get("currentPassword") ?? "");
   const password = String(formData.get("password") ?? "");
   const confirmation = String(formData.get("confirmation") ?? "");
   if (password.length < 8) return { error: "Sandi baru minimal 8 karakter." };
   if (password !== confirmation) return { error: "Konfirmasi sandi belum sama." };
-  if (password === currentPassword) return { error: "Sandi baru harus berbeda dari sandi saat ini." };
 
   const id = Number(session.user.id);
-  const account = await prisma.user.findUnique({ where: { id }, select: { password: true } });
-  if (!account || !(await bcrypt.compare(currentPassword, account.password))) return { error: "Sandi saat ini tidak sesuai." };
   await prisma.user.update({ where: { id }, data: { password: await bcrypt.hash(password, 12) } });
   revalidateAccountPages();
   return { success: "Sandi berhasil diubah." };

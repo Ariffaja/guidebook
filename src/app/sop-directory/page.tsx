@@ -7,7 +7,7 @@ import { getHolidayCalendarData } from "@/lib/holidayCalendar";
 import { getSopAccess } from "@/lib/sopAccess";
 
 export const metadata: Metadata = {
-  title: "SOP Directory - GUIDEBOOK ADMINDUK",
+  title: "Direktori SOP - GUIDEBOOK ADMINDUK",
 };
 
 export default async function SopDirectoryPage({ searchParams }: { searchParams?: Promise<{ status?: string; view?: string }> }) {
@@ -21,7 +21,7 @@ export default async function SopDirectoryPage({ searchParams }: { searchParams?
   ]);
 
   return (
-    <AppLayout pageLabel="SOP Directory">
+    <AppLayout pageLabel="Direktori SOP">
       <SopDirectory
         cases={cases}
         allowedCategories={access?.categories ?? []}

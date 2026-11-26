@@ -13,6 +13,7 @@ type HeaderProps = {
     name: string | null;
     email: string | null;
     role: string;
+    mentorCategories?: ("dafduk" | "capil")[];
   } | null;
 };
 
@@ -88,7 +89,7 @@ export default function Header({ pageLabel, user }: HeaderProps) {
   return (
     <header className="app-header fixed left-0 right-0 top-0 z-40 flex h-16 items-center justify-between border-b border-slate-200/80 bg-white/90 px-4 shadow-sm backdrop-blur-md sm:px-8 lg:left-[19rem]">
       <div className="flex min-w-0 items-center gap-3">
-        <MobileNav isAdmin={user?.role === "ADMIN"} />
+        <MobileNav isAdmin={user?.role === "ADMIN"} isMentor={user?.role === "MENTOR"} mentorCategories={user?.mentorCategories} />
 
         <span className="truncate text-base font-semibold text-slate-800 sm:text-lg">
           Guidebook: PLAVON ke SIAK
@@ -150,7 +151,7 @@ export default function Header({ pageLabel, user }: HeaderProps) {
                 </div>
                 <Link href="/profile" onClick={() => setProfileOpen(false)} className="flex items-center gap-3 border-t border-slate-100 px-4 py-3 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50">
                   <Icon name="person" className="text-[19px] text-slate-600" />
-                  <span>Lihat halaman profil</span>
+                  <span>Profil</span>
                 </Link>
                 <LogoutButton />
               </div>

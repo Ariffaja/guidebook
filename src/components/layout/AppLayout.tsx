@@ -3,6 +3,7 @@ import Sidebar from "./Sidebar";
 import Header from "./Header";
 import { auth } from "../../../auth";
 import { redirect } from "next/navigation";
+import { getSopAccess } from "@/lib/sopAccess";
 
 type AppLayoutProps = {
   children: ReactNode;
@@ -21,9 +22,13 @@ export default async function AppLayout({ children, pageLabel }: AppLayoutProps)
     redirect("/login");
   }
 
+  const mentorCategories = session.user.role === "MENTOR"
+    ? (await getSopAccess(Number(session.user.id)))?.categories ?? []
+    : [];
+
   return (
     <div className="app-shell min-h-screen bg-[#F7F9FB] text-slate-800">
-      <Sidebar isAdmin={session.user.role === "ADMIN"} />
+      <Sidebar isAdmin={session.user.role === "ADMIN"} isMentor={session.user.role === "MENTOR"} mentorCategories={mentorCategories} />
       <div className="flex min-h-screen flex-col lg:pl-[19rem]">
         <Header
           pageLabel={pageLabel}
@@ -33,6 +38,7 @@ export default async function AppLayout({ children, pageLabel }: AppLayoutProps)
                   name: session.user.name ?? null,
                   email: session.user.email ?? null,
                   role: session.user.role,
+                  mentorCategories,
                 }
               : null
           }

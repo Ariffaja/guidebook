@@ -29,7 +29,6 @@ export default async function ProfilePage() {
         <div className="mb-6">
           <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-[#657181]">Akun</p>
           <h1 className="text-2xl font-semibold tracking-tight text-[#191c1e] sm:text-[32px]">Profil Pengguna</h1>
-          <p className="mt-1 text-base text-[#424752]">Informasi akun dan keamanan kata sandi.</p>
         </div>
 
         <section className="rounded-xl border border-[#e0e3e5] bg-white p-5 shadow-sm sm:p-6">
@@ -61,22 +60,10 @@ export default async function ProfilePage() {
               <Icon name="lock" className="text-[22px]" />
             </div>
             <div>
-              <h2 className="text-base font-semibold text-[#191c1e]">Kata Sandi</h2>
-              <p className="text-xs text-[#727784]">Kata sandi lama tidak dapat ditampilkan kembali.</p>
+              <h2 className="text-base font-semibold text-[#191c1e]">Ubah kata sandi</h2>
             </div>
           </div>
 
-          <div className="mb-4 flex items-center justify-between gap-3 rounded-lg border border-[#e7eaee] bg-[#f8f9fa] px-4 py-3">
-            <div>
-              <p className="text-xs font-medium text-[#727784]">Status kata sandi</p>
-              <p className="mt-1 font-mono text-sm tracking-[0.2em] text-[#424752]" aria-label="Kata sandi tersimpan dan disamarkan">••••••••••</p>
-            </div>
-            <span className="inline-flex items-center gap-1.5 rounded-md bg-[#e6e8ea] px-2.5 py-1.5 text-xs font-semibold text-[#424752]">
-              <Icon name="verified_user" className="text-[15px]" />Tersimpan aman
-            </span>
-          </div>
-
-          <h3 className="mt-5 text-sm font-semibold text-[#191c1e]">Ubah kata sandi</h3>
           <ChangeOwnPasswordForm />
         </section>
       </div>

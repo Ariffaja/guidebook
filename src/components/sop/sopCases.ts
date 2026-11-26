@@ -1,7 +1,7 @@
 import type { SopCase } from "./sopTypes";
 
 /**
- * Data awal SOP Directory.
+ * Data awal Direktori SOP.
  *
  * Sumber: dua dokumen catatan templat respons operasional PLAVON (Dafduk: 15 entri,
  * Capil: 12 kasus). Redaksi templat disalin apa adanya, termasuk ejaan aslinya.

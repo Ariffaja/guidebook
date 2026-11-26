@@ -74,7 +74,7 @@ export default function SopCaseForm({ initial, allowedCategories = ["dafduk", "c
         className="mb-5 inline-flex items-center gap-1.5 text-sm font-medium text-[#0056B3] hover:text-[#003F87]"
       >
         <Icon name="arrow_back" className="text-[18px]" />
-        Kembali ke SOP Directory
+        Kembali ke Direktori SOP
       </Link>
 
       <div className="mb-5">
@@ -82,7 +82,7 @@ export default function SopCaseForm({ initial, allowedCategories = ["dafduk", "c
           {isEditing ? "Edit Kasus" : "Tambah Kasus"}
         </h1>
         <p className="mt-1 text-sm text-[#59616d]">
-          {isEditing ? "Perbarui informasi kasus dan templat respons." : "Isi informasi kasus dan templat respons yang akan ditampilkan di SOP Directory."}
+          {isEditing ? "Perbarui informasi kasus dan templat respons." : "Isi informasi kasus dan templat respons yang akan ditampilkan di Direktori SOP."}
         </p>
       </div>
 

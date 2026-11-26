@@ -7,7 +7,7 @@ import { getSopCases } from "@/lib/sopCases";
 import { getSopAccess } from "@/lib/sopAccess";
 
 export const metadata: Metadata = {
-  title: "Edit Kasus SOP - SOP Directory",
+  title: "Ubah Kasus SOP - Direktori SOP",
 };
 
 export default async function EditSopCasePage({ params }: { params: Promise<{ id: string }> }) {
@@ -22,7 +22,7 @@ export default async function EditSopCasePage({ params }: { params: Promise<{ id
   if (!sopCase) notFound();
 
   return (
-    <AppLayout pageLabel="Edit Kasus SOP">
+    <AppLayout pageLabel="Ubah Kasus SOP">
       <SopCaseForm initial={sopCase} allowedCategories={access.categories} />
     </AppLayout>
   );

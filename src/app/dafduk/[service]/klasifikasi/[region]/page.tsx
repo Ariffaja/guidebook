@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import AppLayout from "@/components/layout/AppLayout";
 import Breadcrumb from "@/components/ui/Breadcrumb";
 import DafdukWithinVillageVerification from "@/components/dafduk/DafdukWithinVillageVerification";
+import { requireMentorDivision } from "@/lib/mentorAccess";
 
 const regionLabels: Record<string, string> = {
   "dalam-desa-kelurahan": "Dalam Satu Desa / Kelurahan",
@@ -27,6 +28,7 @@ export default async function ClassificationPage({ params }: ClassificationPageP
   const { service, region } = await params;
   const label = service === "pindah-keluar" ? regionLabels[region] : undefined;
   if (!label) notFound();
+  await requireMentorDivision("dafduk");
 
   if (
     service === "pindah-keluar" &&
