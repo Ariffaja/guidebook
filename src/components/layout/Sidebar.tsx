@@ -74,7 +74,6 @@ function NavSection({
 
 function AdminNav({ pathname, onNavigate }: { pathname: string; onNavigate?: () => void }) {
   const searchParams = useSearchParams();
-  const accountRole = searchParams.get("role");
   const isArchive = searchParams.get("view") === "archive";
   const accountActive = pathname === "/account-management" || pathname.startsWith("/account-management/");
   const items: NavItem[] = [
@@ -97,8 +96,6 @@ function AdminNav({ pathname, onNavigate }: { pathname: string; onNavigate?: () 
           <Link href="/account-management" onClick={onNavigate} aria-current={accountActive ? "page" : undefined} className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${accountActive ? "bg-blue-50 text-[#0056B3]" : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"}`}>
             <Icon name="manage_accounts" className={`text-[20px] ${accountActive ? "text-[#0056B3]" : "text-slate-500"}`} />Kelola Akun
           </Link>
-          <Link href="/account-management?role=MENTOR" onClick={onNavigate} aria-current={accountActive && accountRole === "MENTOR" ? "page" : undefined} className={`ml-8 flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium transition-colors ${accountActive && accountRole === "MENTOR" ? "bg-blue-50 text-[#0056B3]" : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"}`}><Icon name="supervisor_account" className="text-[17px]" />Mentor</Link>
-          <Link href="/account-management?role=MAGANG" onClick={onNavigate} aria-current={accountActive && accountRole === "MAGANG" ? "page" : undefined} className={`ml-8 flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium transition-colors ${accountActive && accountRole === "MAGANG" ? "bg-blue-50 text-[#0056B3]" : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"}`}><Icon name="school" className="text-[17px]" />Peserta Magang</Link>
           {items.map((item) => {
             const active = item.href === "/sop-directory"
               ? pathname === item.href && !isArchive

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Icon from "@/components/ui/Icon";
+import DashboardScrollEffects from "@/components/ui/DashboardScrollEffects";
 
 type DashboardActivity = {
   id: string;
@@ -45,7 +46,7 @@ const dateTime = (value: string) => new Intl.DateTimeFormat("id-ID", {
 
 function MetricCard({ title, value, detail, icon, tone }: { title: string; value: number; detail: string; icon: string; tone: string }) {
   return (
-    <div className="rounded-xl border border-[#dfe5ed] bg-white p-5 shadow-sm">
+    <div data-dashboard-reveal className="rounded-xl border border-[#dfe5ed] bg-white p-5 shadow-sm">
       <div className={`mb-4 flex h-11 w-11 items-center justify-center rounded-xl ${tone}`}><Icon name={icon} className="text-[23px]" /></div>
       <p className="text-3xl font-bold tracking-tight text-[#142033]">{value}</p>
       <p className="mt-1 text-sm font-medium text-[#59616d]">{title}</p>
@@ -69,8 +70,9 @@ export default function AdminDashboard({ stats, activities, recentAccounts, ment
   ];
 
   return (
+    <DashboardScrollEffects>
     <div className="flex w-full flex-col pb-8">
-      <div className="mb-6">
+      <div className="mb-6" data-dashboard-intro>
         <h1 className="text-2xl font-semibold tracking-tight text-[#191c1e] sm:text-[32px]">Dashboard Admin</h1>
         <p className="mt-1 text-base text-[#59616d]">Ringkasan akun dan dokumentasi operasional GUIDEBOOK ADMINDUK.</p>
       </div>
@@ -83,7 +85,7 @@ export default function AdminDashboard({ stats, activities, recentAccounts, ment
       </div>
 
       <div className="mt-5 grid items-start gap-5 xl:grid-cols-[minmax(0,1.6fr)_minmax(300px,0.9fr)]">
-        <section className="overflow-hidden rounded-xl border border-[#dfe5ed] bg-white shadow-sm">
+        <section data-dashboard-reveal className="overflow-hidden rounded-xl border border-[#dfe5ed] bg-white shadow-sm">
           <div className="flex items-center justify-between border-b border-[#e8ebef] px-5 py-4">
             <div><h2 className="font-semibold text-[#191c1e]">Aktivitas SOP terbaru</h2><p className="mt-0.5 text-xs text-[#727784]">Perubahan dokumentasi yang tercatat</p></div>
             <Link href="/admin/sop-history" className="text-sm font-semibold text-[#0056B3] hover:text-[#003F87]">Lihat riwayat</Link>
@@ -96,7 +98,7 @@ export default function AdminDashboard({ stats, activities, recentAccounts, ment
           </ul> : <p className="px-5 py-10 text-center text-sm text-[#727784]">Belum ada aktivitas perubahan SOP.</p>}
         </section>
 
-        <section className="rounded-xl border border-[#dfe5ed] bg-white p-5 shadow-sm">
+        <section data-dashboard-reveal className="rounded-xl border border-[#dfe5ed] bg-white p-5 shadow-sm">
           <h2 className="font-semibold text-[#191c1e]">Aksi cepat</h2>
           <div className="mt-4 flex flex-col gap-2.5">
             {quickActions.map((action) => <Link key={action.href} href={action.href} className="flex items-center gap-2.5 rounded-lg border border-[#b7cce5] px-3.5 py-3 text-sm font-medium text-[#0056B3] transition-colors hover:border-[#0056B3] hover:bg-[#f3f7ff]"><Icon name={action.icon} className="text-[19px]" />{action.label}<Icon name="arrow_forward" className="ml-auto text-[17px]" /></Link>)}
@@ -105,7 +107,7 @@ export default function AdminDashboard({ stats, activities, recentAccounts, ment
       </div>
 
       <div className="mt-5 grid items-start gap-5 lg:grid-cols-2">
-        <section className="rounded-xl border border-[#dfe5ed] bg-white p-5 shadow-sm">
+        <section data-dashboard-reveal className="rounded-xl border border-[#dfe5ed] bg-white p-5 shadow-sm">
           <div className="mb-4 flex items-center justify-between"><h2 className="font-semibold text-[#191c1e]">Dokumentasi SOP</h2><Link href="/sop-directory" className="text-xs font-semibold text-[#0056B3] hover:underline">Buka direktori</Link></div>
           <div className="grid grid-cols-2 gap-3">
             <div className="rounded-lg bg-[#f4f7ff] p-4"><p className="text-xs font-medium text-[#59616d]">Dafduk</p><p className="mt-1 text-2xl font-bold text-[#142033]">{stats.dafdukSops}</p><p className="text-xs text-[#727784]">SOP aktif</p></div>
@@ -113,15 +115,16 @@ export default function AdminDashboard({ stats, activities, recentAccounts, ment
           </div>
         </section>
 
-        <section className="rounded-xl border border-[#dfe5ed] bg-white p-5 shadow-sm">
+        <section data-dashboard-reveal className="rounded-xl border border-[#dfe5ed] bg-white p-5 shadow-sm">
           <div className="mb-3 flex items-center justify-between"><h2 className="font-semibold text-[#191c1e]">Akun terbaru</h2><Link href="/account-management" className="text-xs font-semibold text-[#0056B3] hover:underline">Kelola akun</Link></div>
           {recentAccounts.length > 0 ? <ul className="divide-y divide-[#eceef0]">{recentAccounts.map((account) => <li key={account.id} className="flex items-center justify-between gap-3 py-3"><div className="min-w-0"><p className="truncate text-sm font-semibold text-[#191c1e]">{account.name}</p><p className="truncate text-xs text-[#727784]">{account.email}</p><p className="mt-1 text-[11px] text-[#727784]">Dibuat {dateTime(account.createdAt)}</p></div><span className="shrink-0 rounded-full bg-[#edf2ff] px-2.5 py-1 text-[10px] font-bold text-[#3156a0]">{account.role === "MAGANG" ? "MAGANG" : account.role}</span></li>)}</ul> : <p className="py-6 text-sm text-[#727784]">Belum ada akun.</p>}
         </section>
       </div>
 
-      <section className={`mt-5 rounded-xl border p-5 shadow-sm ${warnings.length ? "border-amber-200 bg-amber-50" : "border-[#dfe5ed] bg-white"}`}>
+      <section data-dashboard-reveal className={`mt-5 rounded-xl border p-5 shadow-sm ${warnings.length ? "border-amber-200 bg-amber-50" : "border-[#dfe5ed] bg-white"}`}>
         <div className="flex items-start gap-3"><Icon name={warnings.length ? "warning" : "task_alt"} className={`text-[21px] ${warnings.length ? "text-amber-700" : "text-emerald-700"}`} /><div><h2 className="font-semibold text-[#191c1e]">Peringatan admin</h2>{warnings.length ? <ul className="mt-2 list-inside list-disc space-y-1 text-sm text-amber-900">{warnings.map((warning) => <li key={warning}>{warning}</li>)}</ul> : <p className="mt-1 text-sm text-[#59616d]">Tidak ada hal yang perlu ditindaklanjuti saat ini.</p>}</div></div>
       </section>
     </div>
+    </DashboardScrollEffects>
   );
 }
